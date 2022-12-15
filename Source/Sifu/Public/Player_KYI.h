@@ -26,4 +26,22 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(VisibleAnywhere, Category=Camera)
+	class USpringArmComponent* springArmComp;
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class UCameraComponent* camComp;
+
+	void Turn(float value);
+	void LookUp(float value);
+
+	//이동속도
+	UPROPERTY(EditAnywhere, Category = PlayerSetting)
+	float walkSpeed= 600;
+	//이동방향
+	FVector direction;
+
+	//좌우 이동입력 이벤트 처리함수
+	void InputHorizontal(float value);
+	void InputVertical(float value);
+	void InputJump();
 };
