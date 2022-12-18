@@ -4,6 +4,7 @@
 #include "Player_KYI.h"
 #include <GameFramework/SpringArmComponent.h>
 #include <Camera/CameraComponent.h>
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayer_KYI::APlayer_KYI()
@@ -76,4 +77,10 @@ void APlayer_KYI::InputVertical(float value) {
 }
 void APlayer_KYI::InputJump() {
 	Jump();
+}
+
+void APlayer_KYI::Attack() {
+	canAttack = false;
+	//PlayAnimMontage(TEXT(""));//애니메이션 경로 추가
+	//UWorld::LineTraceSingleByChannel();
 }

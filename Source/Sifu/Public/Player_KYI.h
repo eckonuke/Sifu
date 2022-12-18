@@ -39,9 +39,12 @@ public:
 	float walkSpeed= 600;
 	//이동방향
 	FVector direction;
+	//공격중
+	bool canAttack = true;
 
 	//좌우 이동입력 이벤트 처리함수
 	void InputHorizontal(float value);
 	void InputVertical(float value);
 	void InputJump();
+	void Attack();
 };
