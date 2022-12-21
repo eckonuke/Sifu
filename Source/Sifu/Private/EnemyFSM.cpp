@@ -26,10 +26,8 @@ void UEnemyFSM::BeginPlay()
 
 	//월드에서 APlayer_KYI 타깃 찾아오기
 	auto actor = UGameplayStatics::GetActorOfClass(GetWorld(), APlayer_KYI::StaticClass());
-
 	//APlayer_KYI 타입으로 캐스팅
 	target = Cast<APlayer_KYI>(actor);
-
 	//소유 객체 가져오기
 	me = Cast<AHJ_Enemy>(GetOwner());
 }
@@ -78,10 +76,8 @@ void UEnemyFSM::MoveState()
 {
 	//1.타깃 목적지가 필요하다.
 	FVector destination = target->GetActorLocation();
-
 	//2.방향이 필요하다.
 	FVector dir = destination - me->GetActorLocation();
-
 	me->AddMovementInput(dir.GetSafeNormal());
 
 	//타깃과 가까워지면 공격 상태로 전환하고 싶다.
@@ -103,7 +99,6 @@ void UEnemyFSM::AttackState()
 	{
 		//3. 공격하고 싶다.
 		UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
-
 		target->OnHitDamage();
 
 		// 경과 시간 초기화
@@ -171,4 +166,3 @@ void UEnemyFSM::DieState()
 		me->Destroy();
 	}
 }
-

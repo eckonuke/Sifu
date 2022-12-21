@@ -55,8 +55,6 @@ void APlayer_KYI::Tick(float DeltaTime)
 	SetActorLocation(p);*/
 	AddMovementInput(direction);
 	direction = FVector::ZeroVector;
-
-
 	//상태를 죽음으로 전환 hj 수정
 	if (hp <= 0)PlayerDie();
 
@@ -72,6 +70,7 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &APlayer_KYI::InputHorizontal);
 	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &APlayer_KYI::InputVertical);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
+	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, this, &APlayer_KYI::PlayerDamage);
 }
 
 void APlayer_KYI::Turn(float value) {
@@ -87,23 +86,9 @@ void APlayer_KYI::InputVertical(float value) {
 	direction.X = value;
 }
 
-
 //적 공격
 void APlayer_KYI::InputJump() {
-	//Jump();
-	TArray<AActor*> enemys;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
-	for (int i = 0; i < enemys.Num(); i++)
-	{
-		//거리 계산 (Player - enemy)
-		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
-		float dist = v.Length();
-		if (dist < 300)
-		{
-			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
-			e->fsm->OnDamageProcess();
-		}
-	}
+	Jump();
 }
 
 void APlayer_KYI::OnHitDamage()
@@ -120,22 +105,29 @@ void APlayer_KYI::OnHitDamage()
 	{
 		//상태를 죽음으로 전환
 		PlayerDie();
-
-
 		//캡슐 충돌체 비활성화
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//GetComponentByClass(UCapsuleComponent::StaticClass())
-
-
 	}
 }
 
 //피격 상태
 void APlayer_KYI::PlayerDamage()
 {
-	//
+	TArray<AActor*> enemys;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
+	for (int i = 0; i < enemys.Num(); i++)
+	{
+		//거리 계산 (Player - enemy)
+		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
+		float dist = v.Length();
+		if (dist < 300)
+		{
+			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
+			e->fsm->OnDamageProcess();
+		}
+	}
 }
-
 
 void APlayer_KYI::PlayerDie()
 {
@@ -153,11 +145,7 @@ void APlayer_KYI::PlayerDie()
 }
 
 
-
-
-
 //HJ가 다중 AI 위해 만듬 추후에 쓸 수 있음 쓸 예정.
-
 void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);

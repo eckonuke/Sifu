@@ -22,9 +22,6 @@ AHJ_Enemy::AHJ_Enemy()
 	}
 	//EnemyFSM 컴포넌트 추가
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
-
-
-
 }
 
 // Called when the game starts or when spawned
