@@ -5,11 +5,13 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <Camera/CameraComponent.h>
 #include <Kismet/GameplayStatics.h>
+#include <GameFramework/Character.h>
+#include "HJ_Enemy.h"
 
 // Sets default values
 APlayer_KYI::APlayer_KYI()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
 	if (tempMesh.Succeeded()) {
@@ -35,7 +37,7 @@ APlayer_KYI::APlayer_KYI()
 void APlayer_KYI::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -83,4 +85,63 @@ void APlayer_KYI::Attack() {
 	canAttack = false;
 	//PlayAnimMontage(TEXT(""));//애니메이션 경로 추가
 	//UWorld::LineTraceSingleByChannel();
+}
+//적 공격
+void APlayer_KYI::InputJump() {
+	//Jump();
+	TArray<AActor*> enemys;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
+	for (int i = 0; i < enemys.Num(); i++)
+	{
+		//거리 계산 (Player - enemy)
+		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
+		float dist = v.Length();
+		if (dist < 300)
+		{
+			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
+			e->fsm->OnDamageProcess();
+		}
+	}
+}
+
+void APlayer_KYI::OnHitDamage()
+{
+	//체력 감소
+	hp--;
+	//만약 체력이 남아있다면 
+	if (hp > 0)
+	{
+		//상태를 피격으로 전환
+		PlayerDamage();
+	}
+	else
+	{
+		//상태를 죽음으로 전환
+		PlayerDie();
+		//캡슐 충돌체 비활성화
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//GetComponentByClass(UCapsuleComponent::StaticClass())
+	}
+}
+
+//피격 상태
+void APlayer_KYI::PlayerDamage()
+{
+	//
+}
+
+
+void APlayer_KYI::PlayerDie()
+{
+	//계속 아래로 내려가고 싶다. p=p0+vt
+	FVector p0 = GetActorLocation();
+	FVector p = p0 + FVector::DownVector * PlayerdieSpeed * GetWorld()->DeltaTimeSeconds;
+	SetActorLocation(p);
+
+	//1. 만약 2미터 이상 내려왔다면
+	if (p.Z < -200.0f)
+	{
+		//2. 제거시킨다
+		Destroy();
+	}
 }

@@ -34,6 +34,11 @@ public:
 	void Turn(float value);
 	void LookUp(float value);
 
+	//HJ 가 수정
+	void OnHitDamage();
+	void PlayerDamage();
+	void  PlayerDie();
+
 	//이동속도
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float walkSpeed= 600;
