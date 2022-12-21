@@ -7,7 +7,7 @@
 // Sets default values 
 AHJ_Enemy::AHJ_Enemy()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//1.스켈레탈메시 데이터 로드
@@ -21,7 +21,7 @@ AHJ_Enemy::AHJ_Enemy()
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -88), FRotator(0, -90, 0));
 	}
 	//EnemyFSM 컴포넌트 추가
-	 fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
+	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
 
 
 
@@ -31,7 +31,7 @@ AHJ_Enemy::AHJ_Enemy()
 void AHJ_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
