@@ -63,7 +63,7 @@ public:
 	class APlayer_KYI* target;
 
 	//소유 액터
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AHJ_Enemy* me;
 
 	//공격 범위
@@ -74,7 +74,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 	float attackDelayTime = 2.0f;
 
-	//피격 알림 이벤트 함수
+	UFUNCTION(BlueprintCallable)
 	void OnDamageProcess();
 
 	//체력
