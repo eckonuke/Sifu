@@ -133,7 +133,7 @@ void APlayer_KYI::OnHitDamage()
 //피격 상태
 void APlayer_KYI::PlayerDamage()
 {
-	//
+	
 }
 
 

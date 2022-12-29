@@ -31,5 +31,11 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category=FSMComponent)
 	class UEnemyFSM* fsm;
 
+
+	//발사체 움직임 Componenet
+	UPROPERTY(EditAnywhere)
+		class UProjectileMovementComponent* compProjectile;
+
+
 	
 };

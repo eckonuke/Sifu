@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include <GameFramework/ProjectileMovementComponent.h>
 #include "EnemyFSM.generated.h"
 
 //사용자 상태 정의 
@@ -54,7 +55,7 @@ public:
 	//일정 시간 기다렸다가 이동 상태로 전환하고 싶다.
 	//대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
-		float idleDelayTime = 2;
+		float idleDelayTime = 2.0;
 	//경과 시간
 	float currentTime = 0;
 
@@ -68,7 +69,7 @@ public:
 
 	//공격 범위
 	UPROPERTY(EditAnywhere, Category = FSM)
-		float attackRange = 150.0f;
+		float attackRange = 100.0f;
 
 	//공격 대기 시간
 	UPROPERTY(EditAnywhere, Category = FSM)
@@ -79,17 +80,31 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)
-	int32 hp =3;
+	int32 hp =5;
 
 	//피격 대기 시간
 	UPROPERTY(EditAnywhere,Category = FSM)
-	float damageDelayTime = 2.0f;
+	float damageDelayTime = 1.0f;
 
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere,Category= FSM)
 	float dieSpeed= 50.0f;
 
+	//사용 중인 애니메이션 블루프린트
+	UPROPERTY()
+	class UHJ_EnemyAnim* anim;
+
+	//발사체 움직임 Componenet
+// 	UPROPERTY(EditAnywhere)
+// 		class UProjectileMovementComponent* compProjectile;
 
 
+// 	//피격 당했을 때 뒤로 밀려나는 속도
+// 	UPROPERTY(EditAnywhere)
+// 	float speed = 100;
+
+//Enemy 를 소유하고 있는 AIController
+//UPROPERTY()
+//class AAIController *ai;
 
 };

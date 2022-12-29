@@ -6,6 +6,9 @@
 #include "Player_KYI.h"
 #include "HJ_Enemy.h"
 #include <Components/CapsuleComponent.h>
+#include "HJ_EnemyAnim.h"
+#include <GameFramework/CharacterMovementComponent.h>
+
 
 
 // Sets default values for this component's properties
@@ -32,6 +35,12 @@ void UEnemyFSM::BeginPlay()
 
 	//소유 객체 가져오기
 	me = Cast<AHJ_Enemy>(GetOwner());
+	me->GetCharacterMovement()->MaxWalkSpeed = 300;
+	//UEnemyAnim* 할당
+	anim = Cast<UHJ_EnemyAnim>(me->GetMesh()->GetAnimInstance());
+
+	//compProjectile=CreateDefaultSubobject< UProjectileMovementComponent>(TEXT("compProject"));
+
 }
 
 
@@ -69,8 +78,16 @@ void UEnemyFSM::IdleState()
 	{
 		//3. 이동 상태로 전환하고 싶다.
 		mState = EEnemyState::Move;
-		//경과 시가 초기화
+		//경과 시간 초기화
 		currentTime = 0;
+
+		//Idle 애니메이션 재생
+// 		int32 index = FMath::RandRange(0,1);
+		anim->PlayDamageAnim(TEXT("Move0"));
+
+
+		//애니메이션 상태 동기화 
+		anim->animState = mState;
 	}
 }
 //이동 상태
@@ -88,8 +105,21 @@ void UEnemyFSM::MoveState()
 	//1. 만약 거리가 공격 범위 안에 들어오면 
 	if (dir.Size() < attackRange)
 	{
+		anim->StopAllMontages(currentTime);
 		//2. 공격 상태로 전환하고 싶다.
 		mState = EEnemyState::Attack;
+
+		//애니메이션 상태 동기화
+		anim->animState = mState;
+		 
+		//공격 애니메이션 재생 활성화 
+		anim->PlayDamageAnim(TEXT("Idle0"));
+
+		//공격 상태 전환 시 대기 시간이 바로 끝나도록 처리
+		currentTime = attackDelayTime;
+
+
+
 	}
 }
 //공격 상태
@@ -105,9 +135,16 @@ void UEnemyFSM::AttackState()
 		UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
 
 		target->OnHitDamage();
-		
+
 		// 경과 시간 초기화
 		currentTime = 0;
+// 		int32 index = FMath::RandRange(1,3);
+// 		FString sectionName = FString::Printf(TEXT("Fight%d"),index);
+// 		anim->PlayDamageAnim(TEXT("Fight"));
+		anim->PlayDamageAnim(TEXT("Fight2"));
+
+
+		//anim->bAttackPlay = true;
 	}
 	//목표: 타깃이 공격 범위를 벗어나면 상태를 이동으로 전환하고 싶다.
 	//1. 타깃과의 거리가 필요하다.
@@ -118,6 +155,9 @@ void UEnemyFSM::AttackState()
 	{
 		//3. 상태를 이동으로 전환하고 싶다.
 		mState = EEnemyState::Move;
+		anim->PlayDamageAnim(TEXT("Move0"));
+		//애니메이션 상태 동기화
+		anim->animState = mState;
 	}
 }
 
@@ -131,6 +171,17 @@ void UEnemyFSM::OnDamageProcess()
 	{
 		//상태를 피격으로 전환
 		mState = EEnemyState::Damage;
+
+		//플레이어한테 맞으면 뒤로 밀려난다
+		FVector s = me->GetActorLocation()+(-me->GetActorForwardVector()*200);
+		me->SetActorLocation(s);
+		currentTime = 0;
+
+		//피격 애니메이션 재생
+		anim->PlayDamageAnim(TEXT("Damage0"));
+// 		int32 index = FMath::RandRange(0,1);
+// 		FString sectionName = FString::Printf(TEXT("Damage%d"),index);
+// 		anim->PlayDamageAnim(FName(*sectionName));
 	}
 	else
 	{
@@ -138,8 +189,26 @@ void UEnemyFSM::OnDamageProcess()
 		mState = EEnemyState::Die;
 		//캡슐 충돌체 비활성화
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		//죽음 애니메이션 재생
+		anim->PlayDamageAnim(TEXT("Die"));
+
+// 		//Movement 가 움직여야 할 Component 를 설정
+// 		//AHJ_Enemy* compProjectile = Cast <AHJ_Enemy>(me->GetMesh());
+// 		
+// 			me->compProjectile->SetUpdatedComponent(me->GetMesh());
+// 		//초기 속력
+// 				me->compProjectile->InitialSpeed = 2000;
+// 				//최대 속력
+// 				me->compProjectile->MaxSpeed = 2000;
+// 		//반동 여부(튕기는 여부)
+// 		me->compProjectile->bShouldBounce = true;
+// 		//얼마나 잘 튕기게 할 것인지(0 ~ 1)
+// 		me->compProjectile->Bounciness = 1.0f;
+		
 	}
-	//me->Destroy();
+	//애니메이션 상태 동기화
+	anim->animState = mState;
 }
 //피격 상태
 void UEnemyFSM::DamageState()
@@ -149,16 +218,41 @@ void UEnemyFSM::DamageState()
 	//2. 만약 경과 시간이 대기 시간을 초과했다면
 	if (currentTime > damageDelayTime)
 	{
+
+	
 		//3. 대기 상태로 전환하고 싶다.
 		mState = EEnemyState::Idle;
 		//경과 시간 초기화
 		currentTime = 0;
+
+		anim->PlayDamageAnim(TEXT("Fight0"));
+		//애니메이션 상태 동기화
+		anim->animState = mState;
 	}
+
+	//p=p0+vt;
+// 	FVector p0 = me -> GetActorLocation();
+// 
+// 	FVector vt = -me-> GetActorForwardVector();
+// 
+// 	FVector p = p0 + vt * speed * GetWorld()->DeltaRealTimeSeconds;
+// 
+// 	me->SetActorLocation(p);
+
 
 }
 //죽음 상태
 void UEnemyFSM::DieState()
 {
+
+	//아직 죽음 애니메이션이 끝나지 않았다면 
+	//바닥까지 내려가지 않도록 처리
+	if ( anim->bDieDone == false )
+	{
+		return;
+	}
+
+	
 	//계속 아래로 내려가고 싶다. p=p0+vt
 	FVector p0 = me->GetActorLocation();
 	FVector p = p0 + FVector::DownVector * dieSpeed * GetWorld()->DeltaTimeSeconds;

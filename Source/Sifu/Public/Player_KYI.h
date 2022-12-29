@@ -60,7 +60,7 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 hp = 1;
+		int32 hp = 10;
 
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere)
