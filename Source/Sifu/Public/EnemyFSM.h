@@ -55,12 +55,15 @@ public:
 	//일정 시간 기다렸다가 이동 상태로 전환하고 싶다.
 	//대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
-		float idleDelayTime = 2.0;
+
+	float idleDelayTime = 2;
+
 	//경과 시간
 	float currentTime = 0;
 
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
+
 		class APlayer_KYI* target;
 
 	//소유 액터
@@ -99,12 +102,32 @@ public:
 // 		class UProjectileMovementComponent* compProjectile;
 
 
-// 	//피격 당했을 때 뒤로 밀려나는 속도
-// 	UPROPERTY(EditAnywhere)
-// 	float speed = 100;
+	//소유 액터
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AHJ_Enemy* me;
 
-//Enemy 를 소유하고 있는 AIController
-//UPROPERTY()
-//class AAIController *ai;
+
+	//공격 범위
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float attackRange = 150.0f;
+
+	//공격 대기 시간
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float attackDelayTime = 2.0f;
+
+	UFUNCTION(BlueprintCallable)
+	void OnDamageProcess();
+
+	//체력
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+	int32 hp = 3;
+
+	//피격 대기 시간
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float damageDelayTime = 2.0f;
+
+	//아래로 사라지는 속도
+	UPROPERTY(EditAnywhere, Category = FSM)
+	float dieSpeed = 50.0f;
 
 };

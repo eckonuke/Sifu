@@ -20,7 +20,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+
+public:
+
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Called every frame
@@ -32,7 +34,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, Category=Camera)
+	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp;
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* camComp;
@@ -42,7 +44,7 @@ public:
 
 	//이동속도
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
-	float walkSpeed= 600;
+	float walkSpeed = 600;
 	//이동방향
 	FVector direction;
 
@@ -50,6 +52,7 @@ public:
 	void InputHorizontal(float value);
 	void InputVertical(float value);
 	void InputJump();
+
 
 	
 	//HJ 가 수정
@@ -66,6 +69,5 @@ public:
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere)
 		float PlayerdieSpeed = 50.0f;
-		
 
 };

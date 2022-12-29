@@ -4,6 +4,13 @@
 #include "Player_KYI.h"
 #include <GameFramework/SpringArmComponent.h>
 #include <Camera/CameraComponent.h>
+#include <Components/SphereComponent.h>
+#include "HJ_Enemy.h"
+#include "EnemyFSM.h"
+#include <Engine/SkeletalMesh.h>
+#include <GameFramework/Character.h>
+#include <Kismet/GameplayStatics.h>
+#include <Components/CapsuleComponent.h>
 
 #include <Components/SphereComponent.h>
 #include "HJ_Enemy.h"
@@ -17,7 +24,7 @@
 // Sets default values
 APlayer_KYI::APlayer_KYI()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
 	if (tempMesh.Succeeded()) {
@@ -46,13 +53,14 @@ APlayer_KYI::APlayer_KYI()
 void APlayer_KYI::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
 void APlayer_KYI::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	direction = FTransform(GetControlRotation()).TransformVector(direction);
 	/*FVector p0 = GetActorLocation();
 	FVector vt = direction * walkSpeed * DeltaTime;
@@ -60,6 +68,8 @@ void APlayer_KYI::Tick(float DeltaTime)
 	SetActorLocation(p);*/
 	AddMovementInput(direction);
 	direction = FVector::ZeroVector;
+	//상태를 죽음으로 전환 hj 수정
+	if (hp <= 0)PlayerDie();
 
 	direction = FTransform(GetControlRotation()).TransformVector(direction);
 	/*FVector p0 = GetActorLocation();
@@ -85,6 +95,7 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &APlayer_KYI::InputHorizontal);
 	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &APlayer_KYI::InputVertical);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
+	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::PlayerDamage);
 }
 
 void APlayer_KYI::Turn(float value) {
@@ -121,7 +132,9 @@ void APlayer_KYI::InputJump() {
 
 void APlayer_KYI::OnHitDamage()
 {
+
     //체력 감소
+
 	hp--;
 	//만약 체력이 남아있다면 
 	if (hp > 0)
@@ -139,7 +152,7 @@ void APlayer_KYI::OnHitDamage()
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//GetComponentByClass(UCapsuleComponent::StaticClass())
 		
-		
+
 	}
 }
 
@@ -149,11 +162,10 @@ void APlayer_KYI::PlayerDamage()
 	
 }
 
-
 void APlayer_KYI::PlayerDie()
 {
 	//계속 아래로 내려가고 싶다. p=p0+vt
-	FVector p0 =GetActorLocation();
+	FVector p0 = GetActorLocation();
 	FVector p = p0 + FVector::DownVector * PlayerdieSpeed * GetWorld()->DeltaTimeSeconds;
 	SetActorLocation(p);
 
@@ -166,11 +178,8 @@ void APlayer_KYI::PlayerDie()
 }
 
 
-
-
-
 //HJ가 다중 AI 위해 만듬 추후에 쓸 수 있음 쓸 예정.
- 
+
 void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
