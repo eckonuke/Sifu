@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "Player_KYI.generated.h"
 
 UCLASS()
@@ -20,8 +21,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//hj 가 한출 추가
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -44,4 +50,22 @@ public:
 	void InputHorizontal(float value);
 	void InputVertical(float value);
 	void InputJump();
+
+	
+	//HJ 가 수정
+	void OnHitDamage();
+	
+	void PlayerDamage();
+
+	void  PlayerDie();
+
+	//체력
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		int32 hp = 10;
+
+	//아래로 사라지는 속도
+	UPROPERTY(EditAnywhere)
+		float PlayerdieSpeed = 50.0f;
+		
+
 };
