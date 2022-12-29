@@ -39,7 +39,7 @@ public:
 public:
 	//상태 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)// VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-		EEnemyState mState = EEnemyState::Idle;
+	EEnemyState mState = EEnemyState::Idle;
 
 	//대기 상태
 	void IdleState();
@@ -63,12 +63,9 @@ public:
 
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
+	class APlayer_KYI* target;
 
-		class APlayer_KYI* target;
 
-	//소유 액터
-	UPROPERTY()
-		class AHJ_Enemy* me;
 
 	//공격 범위
 	UPROPERTY(EditAnywhere, Category = FSM)
@@ -78,7 +75,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackDelayTime = 2.0f;
 
-	//피격 알림 이벤트 함수
+	UFUNCTION(BlueprintCallable)
 	void OnDamageProcess();
 
 	//체력
@@ -106,28 +103,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AHJ_Enemy* me;
 
-
-	//공격 범위
-	UPROPERTY(EditAnywhere, Category = FSM)
-	float attackRange = 150.0f;
-
-	//공격 대기 시간
-	UPROPERTY(EditAnywhere, Category = FSM)
-	float attackDelayTime = 2.0f;
-
-	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess();
-
-	//체력
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
-	int32 hp = 3;
-
-	//피격 대기 시간
-	UPROPERTY(EditAnywhere, Category = FSM)
-	float damageDelayTime = 2.0f;
-
-	//아래로 사라지는 속도
-	UPROPERTY(EditAnywhere, Category = FSM)
-	float dieSpeed = 50.0f;
 
 };
