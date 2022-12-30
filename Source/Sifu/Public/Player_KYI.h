@@ -20,9 +20,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
 public:
-
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Called every frame
@@ -34,25 +32,31 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//Spring Arm
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp;
+	//Camera Component
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* camComp;
 
-	void Turn(float value);
-	void LookUp(float value);
-
+	////공격중 이동 중지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool movementEnabled = true;
 	//이동속도
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float walkSpeed = 600;
+	UPROPERTY(EditAnywhere)
+	bool isBlocking = false;
 	//이동방향
 	FVector direction;
 
 	//좌우 이동입력 이벤트 처리함수
+	void Turn(float value);
+	void LookUp(float value);
 	void InputHorizontal(float value);
 	void InputVertical(float value);
 	void InputJump();
-
+	void PlayerBlock(bool value);
 
 	
 	//HJ 가 수정
@@ -60,14 +64,13 @@ public:
 	
 	void PlayerDamage();
 
-	void  PlayerDie();
+	void PlayerDie();
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 hp = 10;
-
+	int32 hp = 5;
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere)
-		float PlayerdieSpeed = 50.0f;
+	float PlayerdieSpeed = 50.0f;
 
 };

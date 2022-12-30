@@ -53,7 +53,6 @@ APlayer_KYI::APlayer_KYI()
 void APlayer_KYI::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
@@ -79,10 +78,8 @@ void APlayer_KYI::Tick(float DeltaTime)
 	AddMovementInput(direction);
 	direction = FVector::ZeroVector;
 
-
 	//상태를 죽음으로 전환 hj 수정
 	if(hp<=0)PlayerDie();
-
 }
 
 // Called to bind functionality to input
@@ -92,17 +89,25 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &APlayer_KYI::Turn);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APlayer_KYI::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &APlayer_KYI::InputHorizontal);
-	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &APlayer_KYI::InputVertical);
+	PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputHorizontal);
+	PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &APlayer_KYI::InputVertical);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
 	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::PlayerDamage);
+	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::PlayerDamage);
+	DECLARE_DELEGATE_OneParam(FBlock, bool);
+	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Pressed, this, &APlayer_KYI::PlayerBlock, true);
+	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Released, this, &APlayer_KYI::PlayerBlock, false);
 }
 
 void APlayer_KYI::Turn(float value) {
-	AddControllerYawInput(value);
+	if (movementEnabled) {
+		AddControllerYawInput(value);
+	}
 }
 void APlayer_KYI::LookUp(float value) {
-	AddControllerPitchInput(value);
+	if (movementEnabled) {
+		AddControllerPitchInput(value);
+	}
 }
 void APlayer_KYI::InputHorizontal(float value) {
 	direction.Y = value;
@@ -111,10 +116,34 @@ void APlayer_KYI::InputVertical(float value) {
 	direction.X = value;
 }
 
-
 //적 공격
 void APlayer_KYI::InputJump() {
-	//Jump();
+	Jump();
+}
+
+void APlayer_KYI::OnHitDamage()
+{
+	if(!isBlocking) {
+		//체력 감소
+		hp--;
+		//만약 체력이 남아있다면 
+		if (hp > 0){
+			//상태를 피격으로 전환
+			PlayerDamage();
+		}
+		else{
+			//상태를 죽음으로 전환
+			PlayerDie();
+			//캡슐 충돌체 비활성화
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			//GetComponentByClass(UCapsuleComponent::StaticClass())
+		}
+	}
+}
+
+//피격 상태
+void APlayer_KYI::PlayerDamage(){
+	movementEnabled = false;
 	TArray<AActor*> enemys;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
 	for (int i = 0; i < enemys.Num(); i++)
@@ -126,40 +155,9 @@ void APlayer_KYI::InputJump() {
 		{
 			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
 			e->fsm->OnDamageProcess();
+			movementEnabled = true;
 		}
 	}
-}
-
-void APlayer_KYI::OnHitDamage()
-{
-
-    //체력 감소
-
-	hp--;
-	//만약 체력이 남아있다면 
-	if (hp > 0)
-	{
-		//상태를 피격으로 전환
-		PlayerDamage();
-	}
-	else
-	{
-		//상태를 죽음으로 전환
-		PlayerDie();
-
-		
-		//캡슐 충돌체 비활성화
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//GetComponentByClass(UCapsuleComponent::StaticClass())
-		
-
-	}
-}
-
-//피격 상태
-void APlayer_KYI::PlayerDamage()
-{
-	
 }
 
 void APlayer_KYI::PlayerDie()
@@ -177,9 +175,12 @@ void APlayer_KYI::PlayerDie()
 	}
 }
 
+void APlayer_KYI::PlayerBlock(bool value) {
+	isBlocking = value;
+	//Animation 삽입
+}
 
 //HJ가 다중 AI 위해 만듬 추후에 쓸 수 있음 쓸 예정.
-
 void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
@@ -187,7 +188,6 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 	AHJ_Enemy* enemy = Cast<AHJ_Enemy>(OtherActor);
 	if (enemy)
 	{
-		enemy->fsm->OnDamageProcess();
+		//enemy->fsm->OnDamageProcess();
 	}
 }
-
