@@ -18,7 +18,7 @@ UEnemyFSM::UEnemyFSM()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+
 }
 
 
@@ -82,7 +82,7 @@ void UEnemyFSM::IdleState()
 		currentTime = 0;
 
 		//Idle 애니메이션 재생
-// 		int32 index = FMath::RandRange(0,1);
+	    //int32 index = FMath::RandRange(0,1);
 		anim->PlayDamageAnim(TEXT("Move0"));
 
 
