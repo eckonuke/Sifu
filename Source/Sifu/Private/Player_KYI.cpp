@@ -26,7 +26,7 @@ APlayer_KYI::APlayer_KYI()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("SkeletalMesh'/Game/Mannequin/Character/Mesh/UE4_Mannequin.UE4_Mannequin'"));
 	if (tempMesh.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
@@ -129,7 +129,7 @@ void APlayer_KYI::OnHitDamage()
 		//만약 체력이 남아있다면 
 		if (hp > 0){
 			//상태를 피격으로 전환
-			PlayerDamage();
+			//PlayerDamage();
 		}
 		else{
 			//상태를 죽음으로 전환
@@ -151,7 +151,7 @@ void APlayer_KYI::PlayerDamage(){
 		//거리 계산 (Player - enemy)
 		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
 		float dist = v.Length();
-		if (dist < 300)
+		if (dist < 200)
 		{
 			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
 			e->fsm->OnDamageProcess();
