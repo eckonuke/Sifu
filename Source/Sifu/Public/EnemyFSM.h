@@ -16,6 +16,7 @@ enum class EEnemyState :uint8
 	Attack,
 	Damage,
 	Die,
+	ReturnPos
 };
 
 
@@ -51,21 +52,50 @@ public:
 	void DamageState();
 	//죽음상태
 	void DieState();
+	//리턴
+	void ReturnPosState();
+
+	//피격 시 재생 애님함수
+
+	UFUNCTION(BlueprintCallable)
+	void DamageAnim0();
+
+	UFUNCTION(BlueprintCallable)
+	void DamageAnim1();
+
+	UFUNCTION(BlueprintCallable)
+	void DamageAnim2();
+
+	UFUNCTION(BlueprintCallable)
+	void DamageAnim3();
+
+	UFUNCTION(BlueprintCallable)
+	void DamageAnim4();
+	//타겟을 쫒아 갈 수 있니?
+	bool IsTargetTrace();
+
 
 	//일정 시간 기다렸다가 이동 상태로 전환하고 싶다.
 	//대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
-
 	float idleDelayTime = 2;
 
 	//경과 시간
 	float currentTime = 0;
 
+	//쫓아 갈 수 있는 범위
+	float traceRange = 800;
+
+	//이동할 수 있는 반경
+	float moveRange = 1000;
+
+	//처음 위치를 담아 놓을 변수
+	FVector originPos;
+
+
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
 	class APlayer_KYI* target;
-
-
 
 	//공격 범위
 	UPROPERTY(EditAnywhere, Category = FSM)
@@ -80,8 +110,8 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)
-	int32 hp =5;
-
+	float maxHP = 5;
+	float currHP;
 	//피격 대기 시간
 	UPROPERTY(EditAnywhere,Category = FSM)
 	float damageDelayTime = 1.0f;
@@ -93,11 +123,6 @@ public:
 	//사용 중인 애니메이션 블루프린트
 	UPROPERTY()
 	class UHJ_EnemyAnim* anim;
-
-	//발사체 움직임 Componenet
-// 	UPROPERTY(EditAnywhere)
-// 		class UProjectileMovementComponent* compProjectile;
-
 
 	//소유 액터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

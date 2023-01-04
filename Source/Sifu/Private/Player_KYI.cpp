@@ -129,7 +129,7 @@ void APlayer_KYI::OnHitDamage()
 		//만약 체력이 남아있다면 
 		if (hp > 0){
 			//상태를 피격으로 전환
-			PlayerDamage();
+			//PlayerDamage();
 		}
 		else{
 			//상태를 죽음으로 전환

@@ -26,7 +26,7 @@ AHJ_Enemy::AHJ_Enemy()
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
 
 	//애니메이션 블루프린트 할당하기
-	ConstructorHelpers::FClassFinder<UAnimInstance>tempClass(TEXT("AnimBlueprint'/Game/Blueprint/BP_HJ_EnemyAnim.BP_HJ_EnemyAnim_C'"));
+	ConstructorHelpers::FClassFinder<UAnimInstance>tempClass(TEXT("AnimBlueprint'/Game/Blueprint/HJ_EnemyAnimBP.HJ_EnemyAnimBP_C'"));
 	if (tempClass.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(tempClass.Class);
@@ -39,6 +39,7 @@ void AHJ_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
 }
 
 // Called every frame

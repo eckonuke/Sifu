@@ -60,10 +60,11 @@ public:
 
 	
 	//HJ 가 수정
+	UFUNCTION(BlueprintCallable)
 	void OnHitDamage();
-	
+	UFUNCTION(BlueprintCallable)
 	void PlayerDamage();
-
+	UFUNCTION(BlueprintCallable)
 	void PlayerDie();
 
 	//체력
