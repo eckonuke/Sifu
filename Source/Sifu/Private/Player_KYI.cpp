@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Fiout your copyright notice in the Description page of Project Settings.
 
 
 #include "Player_KYI.h"
@@ -45,11 +45,30 @@ APlayer_KYI::APlayer_KYI()
 	camComp->SetupAttachment(springArmComp);
 	camComp->bUsePawnControlRotation = false;
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempMontage(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
-	if (tempMontage.Succeeded()) {
-		montage = tempMontage.Object;
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempStomach(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
+	if (tempStomach.Succeeded()) {
+		stomach = tempStomach.Object;
 	}
-
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead2(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_2_Montage.Head_Hit_2_Montage'"));
+	if (tempHead2.Succeeded()) {
+		head2 = tempHead2.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead3(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_3_Montage.Head_Hit_3_Montage'"));
+	if (tempHead3.Succeeded()) {
+		head3 = tempHead3.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead4(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_4_Montage.Head_Hit_4_Montage'"));
+	if (tempHead4.Succeeded()) {
+		head4 = tempHead4.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempFallDown(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Sweep_Fall_Montage.Sweep_Fall_Montage'"));
+	if (tempFallDown.Succeeded()) {
+		falldown = tempFallDown.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempBlock(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Block_Hit_Montage.Block_Hit_Montage'"));
+	if (tempBlock.Succeeded()) {
+		block = tempBlock.Object;
+	}
 	bUseControllerRotationYaw = true;
 }
 
@@ -125,6 +144,7 @@ void APlayer_KYI::InputJump() {
 	Jump();
 }
 
+//플레이어가 공격을 받았다
 void APlayer_KYI::OnHitDamage()
 {
 	if(!isBlocking) {
@@ -145,7 +165,7 @@ void APlayer_KYI::OnHitDamage()
 	}
 }
 
-//피격 상태
+//플레이어가 적을 타격
 void APlayer_KYI::PlayerDamage(){
 	movementEnabled = false;
 	TArray<AActor*> enemys;
@@ -164,6 +184,7 @@ void APlayer_KYI::PlayerDamage(){
 	}
 }
 
+//플레이어 죽음
 void APlayer_KYI::PlayerDie()
 {
 	//계속 아래로 내려가고 싶다. p=p0+vt
@@ -179,9 +200,11 @@ void APlayer_KYI::PlayerDie()
 	}
 }
 
+//공격 방어
 void APlayer_KYI::PlayerBlock(bool value) {
 	isBlocking = value;
 	//Animation 삽입
+	PlayAnimMontage(block);
 }
 
 //HJ가 다중 AI 위해 만듬 추후에 쓸 수 있음 쓸 예정.
@@ -196,18 +219,23 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 	}
 }
 
+//Stomach hit
 void APlayer_KYI::HurtAnim0() {
-	PlayAnimMontage(montage);
+	PlayAnimMontage(stomach);
 }
+//head hit2
 void APlayer_KYI::HurtAnim1() {
-	
+	PlayAnimMontage(head2);
 }
+//head hit3
 void APlayer_KYI::HurtAnim2() {
-	
+	PlayAnimMontage(head3);
 }
+//head hit4
 void APlayer_KYI::HurtAnim3() {
-	
+	PlayAnimMontage(head4);
 }
+//fall down 
 void APlayer_KYI::HurtAnim4() {
-	
+	PlayAnimMontage(falldown);
 }

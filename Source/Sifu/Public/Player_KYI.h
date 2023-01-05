@@ -49,8 +49,19 @@ public:
 	bool isBlocking = false;
 	//이동방향
 	FVector direction;
+	//피격 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimMontage* montage;
+	class UAnimMontage* stomach;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* head2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* head3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* head4;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* falldown;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* block;
 
 	//좌우 이동입력 이벤트 처리함수
 	void Turn(float value);
@@ -59,6 +70,7 @@ public:
 	void InputVertical(float value);
 	void InputJump();
 	void PlayerBlock(bool value);
+	//몽타주를 플레이할 함수
 	UFUNCTION(BlueprintCallable)
 	void HurtAnim0();
 	UFUNCTION(BlueprintCallable)
