@@ -19,6 +19,7 @@
 #include <GameFramework/Character.h>
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
+#include <Animation/AnimMontage.h>
 
 
 // Sets default values
@@ -26,7 +27,7 @@ APlayer_KYI::APlayer_KYI()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("SkeletalMesh'/Game/Mannequin/Character/Mesh/UE4_Mannequin.UE4_Mannequin'"));
 	if (tempMesh.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
@@ -44,9 +45,12 @@ APlayer_KYI::APlayer_KYI()
 	camComp->SetupAttachment(springArmComp);
 	camComp->bUsePawnControlRotation = false;
 
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempMontage(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
+	if (tempMontage.Succeeded()) {
+		montage = tempMontage.Object;
+	}
 
 	bUseControllerRotationYaw = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -151,7 +155,7 @@ void APlayer_KYI::PlayerDamage(){
 		//거리 계산 (Player - enemy)
 		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
 		float dist = v.Length();
-		if (dist < 300)
+		if (dist < 200)
 		{
 			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
 			e->fsm->OnDamageProcess();
@@ -190,4 +194,20 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		//enemy->fsm->OnDamageProcess();
 	}
+}
+
+void APlayer_KYI::HurtAnim0() {
+	PlayAnimMontage(montage);
+}
+void APlayer_KYI::HurtAnim1() {
+	
+}
+void APlayer_KYI::HurtAnim2() {
+	
+}
+void APlayer_KYI::HurtAnim3() {
+	
+}
+void APlayer_KYI::HurtAnim4() {
+	
 }
