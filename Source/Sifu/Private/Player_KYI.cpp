@@ -19,6 +19,7 @@
 #include <GameFramework/Character.h>
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
+#include <Animation/AnimMontage.h>
 
 
 // Sets default values
@@ -44,9 +45,12 @@ APlayer_KYI::APlayer_KYI()
 	camComp->SetupAttachment(springArmComp);
 	camComp->bUsePawnControlRotation = false;
 
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempMontage(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
+	if (tempMontage.Succeeded()) {
+		montage = tempMontage.Object;
+	}
 
 	bUseControllerRotationYaw = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -190,4 +194,20 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		//enemy->fsm->OnDamageProcess();
 	}
+}
+
+void APlayer_KYI::HurtAnim0() {
+	PlayAnimMontage(montage);
+}
+void APlayer_KYI::HurtAnim1() {
+	
+}
+void APlayer_KYI::HurtAnim2() {
+	
+}
+void APlayer_KYI::HurtAnim3() {
+	
+}
+void APlayer_KYI::HurtAnim4() {
+	
 }

@@ -133,7 +133,7 @@ void UEnemyFSM::AttackState()
 	{
 		//3. 공격하고 싶다.
 		UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
-
+		target->HurtAnim0();
 		target->OnHitDamage();
 
 		// 경과 시간 초기화
@@ -179,9 +179,9 @@ void UEnemyFSM::OnDamageProcess()
 
 		//피격 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Damage0"));
-// 		int32 index = FMath::RandRange(0,1);
-// 		FString sectionName = FString::Printf(TEXT("Damage%d"),index);
-// 		anim->PlayDamageAnim(FName(*sectionName));
+ 		//int32 index = FMath::RandRange(0,1);
+ 		//FString sectionName = FString::Printf(TEXT("Damage%d"),index);
+ 		//anim->PlayDamageAnim(FName(*sectionName));
 	}
 	else
 	{
@@ -193,18 +193,18 @@ void UEnemyFSM::OnDamageProcess()
 		//죽음 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Die"));
 
-// 		//Movement 가 움직여야 할 Component 를 설정
-// 		//AHJ_Enemy* compProjectile = Cast <AHJ_Enemy>(me->GetMesh());
-// 		
-// 			me->compProjectile->SetUpdatedComponent(me->GetMesh());
-// 		//초기 속력
-// 				me->compProjectile->InitialSpeed = 2000;
-// 				//최대 속력
-// 				me->compProjectile->MaxSpeed = 2000;
-// 		//반동 여부(튕기는 여부)
-// 		me->compProjectile->bShouldBounce = true;
-// 		//얼마나 잘 튕기게 할 것인지(0 ~ 1)
-// 		me->compProjectile->Bounciness = 1.0f;
+		////Movement 가 움직여야 할 Component 를 설정
+		////AHJ_Enemy* compProjectile = Cast <AHJ_Enemy>(me->GetMesh());
+
+		//me->compProjectile->SetUpdatedComponent(me->GetMesh());
+		////초기 속력
+		//me->compProjectile->InitialSpeed = 2000;
+		////최대 속력
+		//me->compProjectile->MaxSpeed = 2000;
+		////반동 여부(튕기는 여부)
+		//me->compProjectile->bShouldBounce = true;
+		////얼마나 잘 튕기게 할 것인지(0 ~ 1)
+		//me->compProjectile->Bounciness = 1.0f;
 		
 	}
 	//애니메이션 상태 동기화
@@ -231,13 +231,13 @@ void UEnemyFSM::DamageState()
 	}
 
 	//p=p0+vt;
-// 	FVector p0 = me -> GetActorLocation();
-// 
-// 	FVector vt = -me-> GetActorForwardVector();
-// 
-// 	FVector p = p0 + vt * speed * GetWorld()->DeltaRealTimeSeconds;
-// 
-// 	me->SetActorLocation(p);
+	//FVector p0 = me -> GetActorLocation();
+	// 
+	//FVector vt = -me-> GetActorForwardVector();
+	// 
+	//FVector p = p0 + vt * speed * GetWorld()->DeltaRealTimeSeconds;
+	// 
+	//me->SetActorLocation(p);
 
 
 }

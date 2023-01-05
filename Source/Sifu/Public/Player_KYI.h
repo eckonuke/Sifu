@@ -49,6 +49,8 @@ public:
 	bool isBlocking = false;
 	//이동방향
 	FVector direction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* montage;
 
 	//좌우 이동입력 이벤트 처리함수
 	void Turn(float value);
@@ -57,7 +59,16 @@ public:
 	void InputVertical(float value);
 	void InputJump();
 	void PlayerBlock(bool value);
-
+	UFUNCTION(BlueprintCallable)
+	void HurtAnim0();
+	UFUNCTION(BlueprintCallable)
+	void HurtAnim1();
+	UFUNCTION(BlueprintCallable)
+	void HurtAnim2();
+	UFUNCTION(BlueprintCallable)
+	void HurtAnim3();
+	UFUNCTION(BlueprintCallable)
+	void HurtAnim4();
 	
 	//HJ 가 수정
 	void OnHitDamage();
