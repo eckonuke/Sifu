@@ -128,5 +128,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AHJ_Enemy* me;
 
+// 	Enemy 를 소유하고 있는 AIController
+// 	UPROPERTY()
+// 	class AAIController* ai;
 
 };

@@ -48,6 +48,8 @@ void UEnemyFSM::BeginPlay()
 
 	//처음 위치 셋팅
 	originPos = me->GetActorLocation();
+
+	//AIController
 }
 
 
