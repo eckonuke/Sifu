@@ -8,7 +8,7 @@ public class Sifu : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG","NavigationSystem","AIMode" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG","NavigationSystem","AIModule" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
