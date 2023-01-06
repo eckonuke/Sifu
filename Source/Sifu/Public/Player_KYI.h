@@ -45,7 +45,7 @@ public:
 	//이동속도
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float walkSpeed = 600;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isBlocking = false;
 	//이동방향
 	FVector direction;
@@ -61,6 +61,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAnimMontage* falldown;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* death;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAnimMontage* block;
 
 	//좌우 이동입력 이벤트 처리함수
@@ -69,6 +71,7 @@ public:
 	void InputHorizontal(float value);
 	void InputVertical(float value);
 	void InputJump();
+	UFUNCTION(BlueprintCallable)
 	void PlayerBlock(bool value);
 	//몽타주를 플레이할 함수
 	UFUNCTION(BlueprintCallable)
@@ -97,4 +100,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float PlayerdieSpeed = 50.0f;
 
+	//공격 콤보
+	UPROPERTY()
+	int combo = 0;
+	bool attackButton = false;
+	bool isAttacking = false;
 };

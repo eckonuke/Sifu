@@ -65,6 +65,10 @@ APlayer_KYI::APlayer_KYI()
 	if (tempFallDown.Succeeded()) {
 		falldown = tempFallDown.Object;
 	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempDeath(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Death.Death'"));
+	if (tempDeath.Succeeded()) {
+		death = tempDeath.Object;
+	}
 	ConstructorHelpers::FObjectFinder<UAnimMontage> tempBlock(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Block_Hit_Montage.Block_Hit_Montage'"));
 	if (tempBlock.Succeeded()) {
 		block = tempBlock.Object;
@@ -192,6 +196,7 @@ void APlayer_KYI::PlayerDie()
 	FVector p = p0 + FVector::DownVector * PlayerdieSpeed * GetWorld()->DeltaTimeSeconds;
 	SetActorLocation(p);
 
+	PlayAnimMontage(death);
 	//1. 만약 2미터 이상 내려왔다면
 	if (p.Z < -200.0f)
 	{
@@ -203,8 +208,6 @@ void APlayer_KYI::PlayerDie()
 //공격 방어
 void APlayer_KYI::PlayerBlock(bool value) {
 	isBlocking = value;
-	//Animation 삽입
-	PlayAnimMontage(block);
 }
 
 //HJ가 다중 AI 위해 만듬 추후에 쓸 수 있음 쓸 예정.
@@ -222,20 +225,25 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
 //Stomach hit
 void APlayer_KYI::HurtAnim0() {
 	PlayAnimMontage(stomach);
+	OnHitDamage();
 }
 //head hit2
 void APlayer_KYI::HurtAnim1() {
 	PlayAnimMontage(head2);
+	OnHitDamage();
 }
 //head hit3
 void APlayer_KYI::HurtAnim2() {
 	PlayAnimMontage(head3);
+	OnHitDamage();
 }
 //head hit4
 void APlayer_KYI::HurtAnim3() {
 	PlayAnimMontage(head4);
+	OnHitDamage();
 }
 //fall down 
 void APlayer_KYI::HurtAnim4() {
 	PlayAnimMontage(falldown);
+	OnHitDamage();
 }
