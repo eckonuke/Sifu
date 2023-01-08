@@ -64,6 +64,18 @@ public:
 	class UAnimMontage* death;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAnimMontage* block;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* punch;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* jab;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* uppercut;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* kick;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* highKick;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAnimMontage* lowKick;
 
 	//좌우 이동입력 이벤트 처리함수
 	void Turn(float value);
@@ -71,9 +83,21 @@ public:
 	void InputHorizontal(float value);
 	void InputVertical(float value);
 	void InputJump();
+	void AttackPunch();
+	void AttackKick();
+	UFUNCTION(BlueprintCallable)
+	void saveAttackCombo();
+	UFUNCTION(BlueprintCallable)
+	void punchCombo();
+	UFUNCTION(BlueprintCallable)
+	void kickCombo();
+	UFUNCTION(BlueprintCallable)
+	void ResetCombo();
 	UFUNCTION(BlueprintCallable)
 	void PlayerBlock(bool value);
-	//몽타주를 플레이할 함수
+	UFUNCTION(BlueprintCallable)
+	void setTarget();
+	//공격받은 애니메이션 플레이 함수
 	UFUNCTION(BlueprintCallable)
 	void HurtAnim0();
 	UFUNCTION(BlueprintCallable)
@@ -93,6 +117,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PlayerDie();
 
+	//타게팅 된 적
+	UPROPERTY(EditAnywhere)
+	class AHJ_Enemy* targetEnemy;
+
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 hp = 5;
@@ -101,8 +129,16 @@ public:
 	float PlayerdieSpeed = 50.0f;
 
 	//공격 콤보
-	UPROPERTY()
-	int combo = 0;
-	bool attackButton = false;
-	bool isAttacking = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int punchCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsAttacking = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool saveAttack = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int kickCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool kickorPunch = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Dead = false;
 };

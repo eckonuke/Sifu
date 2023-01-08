@@ -44,7 +44,9 @@ APlayer_KYI::APlayer_KYI()
 	camComp = CreateDefaultSubobject<UCameraComponent>(TEXT("camComp"));
 	camComp->SetupAttachment(springArmComp);
 	camComp->bUsePawnControlRotation = false;
+	bUseControllerRotationYaw = true;
 
+	//피격 애니메이션
 	ConstructorHelpers::FObjectFinder<UAnimMontage> tempStomach(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
 	if (tempStomach.Succeeded()) {
 		stomach = tempStomach.Object;
@@ -65,48 +67,58 @@ APlayer_KYI::APlayer_KYI()
 	if (tempFallDown.Succeeded()) {
 		falldown = tempFallDown.Object;
 	}
+	//죽음
 	ConstructorHelpers::FObjectFinder<UAnimMontage> tempDeath(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Death.Death'"));
 	if (tempDeath.Succeeded()) {
 		death = tempDeath.Object;
 	}
+	//방어
 	ConstructorHelpers::FObjectFinder<UAnimMontage> tempBlock(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Block_Hit_Montage.Block_Hit_Montage'"));
 	if (tempBlock.Succeeded()) {
 		block = tempBlock.Object;
 	}
-	bUseControllerRotationYaw = true;
+	//공격 애니메이션 주먹
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempPunch(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/regular-punch.regular-punch'"));
+	if (tempPunch.Succeeded()) {
+		punch = tempPunch.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempJab(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Lead_Jab_Montage.Lead_Jab_Montage'"));
+	if (tempJab.Succeeded()) {
+		jab = tempJab.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempUpper(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Uppercut_Montage.Uppercut_Montage'"));
+	if (tempUpper.Succeeded()) {
+		uppercut = tempUpper.Object;
+	}
+	//공격 애니메이션 발차기
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/kick-regular_Montage.kick-regular_Montage'"));
+	if (tempKick.Succeeded()) {
+		kick = tempKick.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHighKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/kick-up_Montage.kick-up_Montage'"));
+	if (tempHighKick.Succeeded()) {
+		highKick = tempHighKick.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempLowKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Leg_Sweep_Montage.Leg_Sweep_Montage'"));
+	if (tempLowKick.Succeeded()) {
+		lowKick = tempLowKick.Object;
+	}
 }
 
 // Called when the game starts or when spawned
-void APlayer_KYI::BeginPlay()
-{
+void APlayer_KYI::BeginPlay() {
 	Super::BeginPlay();
 }
 
 // Called every frame
-void APlayer_KYI::Tick(float DeltaTime)
-{
+void APlayer_KYI::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	direction = FTransform(GetControlRotation()).TransformVector(direction);
-	/*FVector p0 = GetActorLocation();
-	FVector vt = direction * walkSpeed * DeltaTime;
-	FVector p = p0 + vt;
-	SetActorLocation(p);*/
-	AddMovementInput(direction);
-	direction = FVector::ZeroVector;
-	//상태를 죽음으로 전환 hj 수정
-	if (hp <= 0)PlayerDie();
-
-	direction = FTransform(GetControlRotation()).TransformVector(direction);
-	/*FVector p0 = GetActorLocation();
-	FVector vt = direction * walkSpeed * DeltaTime;
-	FVector p = p0 + vt;
-	SetActorLocation(p);*/
-	AddMovementInput(direction);
-	direction = FVector::ZeroVector;
-
-	//상태를 죽음으로 전환 hj 수정
-	if(hp<=0)PlayerDie();
+	if (movementEnabled) {
+		direction = FTransform(GetControlRotation()).TransformVector(direction);
+		AddMovementInput(direction);
+		direction = FVector::ZeroVector;
+	}
 }
 
 // Called to bind functionality to input
@@ -114,27 +126,23 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &APlayer_KYI::Turn);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APlayer_KYI::LookUp);
+	PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &APlayer_KYI::Turn);
+	PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &APlayer_KYI::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputHorizontal);
 	PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &APlayer_KYI::InputVertical);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
-	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::PlayerDamage);
-	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::PlayerDamage);
+	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::AttackPunch);
+	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::AttackKick);
 	DECLARE_DELEGATE_OneParam(FBlock, bool);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Pressed, this, &APlayer_KYI::PlayerBlock, true);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Released, this, &APlayer_KYI::PlayerBlock, false);
 }
 
 void APlayer_KYI::Turn(float value) {
-	if (movementEnabled) {
-		AddControllerYawInput(value);
-	}
+	AddControllerYawInput(value);
 }
 void APlayer_KYI::LookUp(float value) {
-	if (movementEnabled) {
-		AddControllerPitchInput(value);
-	}
+	AddControllerPitchInput(value);
 }
 void APlayer_KYI::InputHorizontal(float value) {
 	direction.Y = value;
@@ -142,66 +150,24 @@ void APlayer_KYI::InputHorizontal(float value) {
 void APlayer_KYI::InputVertical(float value) {
 	direction.X = value;
 }
-
-//적 공격
 void APlayer_KYI::InputJump() {
 	Jump();
 }
 
-//플레이어가 공격을 받았다
-void APlayer_KYI::OnHitDamage()
-{
-	if(!isBlocking) {
-		//체력 감소
-		hp--;
-		//만약 체력이 남아있다면 
-		if (hp > 0){
-			//상태를 피격으로 전환
-			//PlayerDamage();
+void APlayer_KYI::setTarget() {
+	FVector startPos = camComp->GetComponentLocation();
+	FVector endPos = startPos + camComp->GetForwardVector()*5000;
+	FHitResult hitinfo;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitinfo, startPos, endPos, ECC_Visibility, params);
+	if (bHit) {
+		UE_LOG(LogTemp, Warning, TEXT("Hit Something"));
+		AHJ_Enemy* enem = Cast<AHJ_Enemy>(hitinfo.GetActor());
+		if (enem) {
+			targetEnemy = enem;
+			UE_LOG(LogTemp,Warning, TEXT("%s"), *targetEnemy->GetName());
 		}
-		else{
-			//상태를 죽음으로 전환
-			PlayerDie();
-			//캡슐 충돌체 비활성화
-			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			//GetComponentByClass(UCapsuleComponent::StaticClass())
-		}
-	}
-}
-
-//플레이어가 적을 타격
-void APlayer_KYI::PlayerDamage(){
-	movementEnabled = false;
-	TArray<AActor*> enemys;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
-	for (int i = 0; i < enemys.Num(); i++)
-	{
-		//거리 계산 (Player - enemy)
-		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
-		float dist = v.Length();
-		if (dist < 200)
-		{
-			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
-			e->fsm->OnDamageProcess();
-			movementEnabled = true;
-		}
-	}
-}
-
-//플레이어 죽음
-void APlayer_KYI::PlayerDie()
-{
-	//계속 아래로 내려가고 싶다. p=p0+vt
-	FVector p0 = GetActorLocation();
-	FVector p = p0 + FVector::DownVector * PlayerdieSpeed * GetWorld()->DeltaTimeSeconds;
-	SetActorLocation(p);
-
-	PlayAnimMontage(death);
-	//1. 만약 2미터 이상 내려왔다면
-	if (p.Z < -200.0f)
-	{
-		//2. 제거시킨다
-		Destroy();
 	}
 }
 
@@ -210,16 +176,136 @@ void APlayer_KYI::PlayerBlock(bool value) {
 	isBlocking = value;
 }
 
-//HJ가 다중 AI 위해 만듬 추후에 쓸 수 있음 쓸 예정.
-void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	Super::NotifyActorBeginOverlap(OtherActor);
-
-	AHJ_Enemy* enemy = Cast<AHJ_Enemy>(OtherActor);
-	if (enemy)
-	{
-		//enemy->fsm->OnDamageProcess();
+//플레이어가 공격을 받았다
+void APlayer_KYI::OnHitDamage() {
+	if (!isBlocking) {
+		//체력 감소
+		hp--;
+		//만약 체력이 남아있다면 
+		if (hp < 0) {
+			//상태를 죽음으로 전환
+			PlayerDie();
+			//캡슐 충돌체 비활성화
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			//GetComponentByClass(UCapsuleComponent::StaticClass())
+			Dead = true;
+		}
 	}
+}
+
+//플레이어가 적을 타격
+void APlayer_KYI::PlayerDamage() {
+	TArray<AActor*> enemys;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
+	for (int i = 0; i < enemys.Num(); i++)
+	{
+		//거리 계산 (Player - enemy)
+		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
+		float dist = v.Length();
+		if (dist < 300) {
+			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
+			e->fsm->OnDamageProcess();
+		}
+	}
+}
+
+//플레이어 죽음
+void APlayer_KYI::PlayerDie()
+{
+	PlayAnimMontage(death);
+	GetMesh()->SetSimulatePhysics(true);
+	SetLifeSpan(10);
+	Destroy();
+}
+
+void APlayer_KYI::AttackPunch() {
+	movementEnabled = false;
+	kickorPunch = true;
+	if (IsAttacking) {
+		saveAttack = true;
+	} else{
+		IsAttacking = true;
+		punchCombo();
+	}
+}
+
+void APlayer_KYI::AttackKick() {
+	movementEnabled = false;
+	kickorPunch = false;
+	if (IsAttacking) {
+		saveAttack = true;
+	}
+	else {
+		IsAttacking = true;
+		kickCombo();
+	}
+}
+
+//플레이어 공격 콤보
+void APlayer_KYI::saveAttackCombo() {
+	if (saveAttack) {
+		saveAttack = false;
+		if (kickorPunch) {
+			punchCombo();
+		}
+		else {
+			kickCombo();
+		}
+	}
+}
+
+//플레이어 콤보 애니메이션 스위치
+void APlayer_KYI::punchCombo() {
+	switch (punchCount)
+	{
+		case 0:
+		punchCount = 1;
+		PlayerDamage();
+		PlayAnimMontage(punch);
+		break;
+		case 1:
+		punchCount = 2;
+		PlayerDamage();
+		PlayAnimMontage(jab);
+		break;
+		case 2:
+		punchCount = 0;
+		PlayerDamage();
+		PlayAnimMontage(uppercut);
+		break;
+	}
+}
+void APlayer_KYI::kickCombo() {
+	switch (kickCount)
+	{
+	case 0:
+		kickCount = 1;
+		PlayerDamage();
+		PlayAnimMontage(kick);
+		break;
+	case 1:
+		kickCount = 2;
+		PlayerDamage();
+		PlayAnimMontage(highKick);
+		break;
+	case 2:
+		kickCount = 0;
+		PlayerDamage();
+		PlayAnimMontage(lowKick);
+		break;
+	}
+}
+//플레이어 공격콤보 재설정
+void APlayer_KYI::ResetCombo() {
+	IsAttacking = false;
+	punchCount = 0;
+	saveAttack = false;
+	kickCount = 0;
+	movementEnabled = true;
+}
+
+void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor){
+	Super::NotifyActorBeginOverlap(OtherActor);
 }
 
 //Stomach hit
