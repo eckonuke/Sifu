@@ -312,24 +312,29 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor){
 void APlayer_KYI::HurtAnim0() {
 	PlayAnimMontage(stomach);
 	OnHitDamage();
+	ResetCombo();
 }
 //head hit2
 void APlayer_KYI::HurtAnim1() {
 	PlayAnimMontage(head2);
 	OnHitDamage();
+	ResetCombo();
 }
 //head hit3
 void APlayer_KYI::HurtAnim2() {
 	PlayAnimMontage(head3);
 	OnHitDamage();
+	ResetCombo();
 }
 //head hit4
 void APlayer_KYI::HurtAnim3() {
 	PlayAnimMontage(head4);
 	OnHitDamage();
+	ResetCombo();
 }
 //fall down 
 void APlayer_KYI::HurtAnim4() {
 	PlayAnimMontage(falldown);
 	OnHitDamage();
+	ResetCombo();
 }
