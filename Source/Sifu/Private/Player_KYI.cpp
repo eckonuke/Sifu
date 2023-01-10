@@ -21,6 +21,7 @@
 #include <Components/CapsuleComponent.h>
 #include <Animation/AnimMontage.h>
 #include <GameFramework/CharacterMovementComponent.h>
+#include "PlayerAnim.h"
 
 
 // Sets default values
@@ -46,6 +47,12 @@ APlayer_KYI::APlayer_KYI()
 	camComp->SetupAttachment(springArmComp);
 	camComp->bUsePawnControlRotation = false;
 	bUseControllerRotationYaw = true;
+
+	//애니메이션 블루프린트 가져오자
+	ConstructorHelpers::FClassFinder<UPlayerAnim> tempAnim(TEXT("AnimBlueprint'/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C'"));
+	if (tempAnim.Succeeded()) {
+		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
+	}
 
 	//피격 애니메이션
 	ConstructorHelpers::FObjectFinder<UAnimMontage> tempStomach(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
@@ -123,6 +130,10 @@ void APlayer_KYI::Tick(float DeltaTime) {
 	setTarget();
 }
 
+void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
+	Super::NotifyActorBeginOverlap(OtherActor);
+}
+
 // Called to bind functionality to input
 void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -159,7 +170,7 @@ void APlayer_KYI::InputJump() {
 	Jump();
 }
 void APlayer_KYI::InputRun(bool run) {
-	if (run) 
+	if (run)
 		GetCharacterMovement()->MaxWalkSpeed = 900;
 	else
 		GetCharacterMovement()->MaxWalkSpeed = 600;
@@ -185,22 +196,25 @@ void APlayer_KYI::setTarget() {
 
 //공격 방어
 void APlayer_KYI::PlayerBlock(bool value) {
-	isBlocking = value;
+	if (!isDead)
+		isBlocking = value;
 }
 
 //플레이어가 공격을 받았다
 void APlayer_KYI::OnHitDamage() {
-	if (!isBlocking) {
-		//체력 감소
-		hp--;
-		//만약 체력이 남아있다면 
-		if (hp < 0) {
-			//상태를 죽음으로 전환
-			PlayerDie();
-			//캡슐 충돌체 비활성화
-			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			//GetComponentByClass(UCapsuleComponent::StaticClass())
-			Dead = true;
+	if (!isDead) {
+		if (!isBlocking) {
+			//체력 감소
+			hp--;
+			//만약에 체력이 없다면
+			if (hp <= 0) {
+				isDead = true;
+				//상태를 죽음으로 전환
+				PlayerDie();
+				//캡슐 충돌체 비활성화
+				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				//GetComponentByClass(UCapsuleComponent::StaticClass())
+			}
 		}
 	}
 }
@@ -232,9 +246,6 @@ void APlayer_KYI::PlayerDamage() {
 void APlayer_KYI::PlayerDie()
 {
 	PlayAnimMontage(death);
-	GetMesh()->SetSimulatePhysics(true);
-	SetLifeSpan(10);
-	Destroy();
 }
 
 void APlayer_KYI::AttackPunch() {
@@ -242,7 +253,8 @@ void APlayer_KYI::AttackPunch() {
 	kickorPunch = true;
 	if (IsAttacking) {
 		saveAttack = true;
-	} else{
+	}
+	else {
 		IsAttacking = true;
 		punchCombo();
 	}
@@ -277,17 +289,17 @@ void APlayer_KYI::saveAttackCombo() {
 void APlayer_KYI::punchCombo() {
 	switch (punchCount)
 	{
-		case 0:
+	case 0:
 		punchCount = 1;
 		//PlayerDamage();
 		PlayAnimMontage(punch);
 		break;
-		case 1:
+	case 1:
 		punchCount = 2;
 		//PlayerDamage();
 		PlayAnimMontage(jab);
 		break;
-		case 2:
+	case 2:
 		punchCount = 0;
 		//PlayerDamage();
 		PlayAnimMontage(uppercut);
@@ -323,37 +335,43 @@ void APlayer_KYI::ResetCombo() {
 	movementEnabled = true;
 }
 
-void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor){
-	Super::NotifyActorBeginOverlap(OtherActor);
-}
-
 //Stomach hit
 void APlayer_KYI::HurtAnim0() {
-	PlayAnimMontage(stomach);
-	OnHitDamage();
-	ResetCombo();
+	if (!isDead) {
+		PlayAnimMontage(stomach);
+		OnHitDamage();
+		ResetCombo();
+	}
 }
 //head hit2
 void APlayer_KYI::HurtAnim1() {
-	PlayAnimMontage(head2);
-	OnHitDamage();
-	ResetCombo();
+	if (!isDead) {
+		PlayAnimMontage(head2);
+		OnHitDamage();
+		ResetCombo();
+	}
 }
 //head hit3
 void APlayer_KYI::HurtAnim2() {
-	PlayAnimMontage(head3);
-	OnHitDamage();
-	ResetCombo();
+	if (!isDead) {
+		PlayAnimMontage(head3);
+		OnHitDamage();
+		ResetCombo();
+	}
 }
 //head hit4
 void APlayer_KYI::HurtAnim3() {
-	PlayAnimMontage(head4);
-	OnHitDamage();
-	ResetCombo();
+	if (!isDead) {
+		PlayAnimMontage(head4);
+		OnHitDamage();
+		ResetCombo();
+	}
 }
 //fall down 
 void APlayer_KYI::HurtAnim4() {
-	PlayAnimMontage(falldown);
-	OnHitDamage();
-	ResetCombo();
+	if (!isDead) {
+		PlayAnimMontage(falldown);
+		OnHitDamage();
+		ResetCombo();
+	}
 }

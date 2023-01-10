@@ -34,48 +34,48 @@ public:
 
 	//Spring Arm
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class USpringArmComponent* springArmComp;
+		class USpringArmComponent* springArmComp;
 	//Camera Component
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class UCameraComponent* camComp;
+		class UCameraComponent* camComp;
 
 	////공격중 이동 중지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool movementEnabled = true;
+		bool movementEnabled = true;
 	//이동속도
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
-	float walkSpeed = 600;
+		float walkSpeed = 600;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isBlocking = false;
+		bool isBlocking = false;
 	//이동방향
 	FVector direction;
 	//피격 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* stomach;
+		class UAnimMontage* stomach;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* head2;
+		class UAnimMontage* head2;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* head3;
+		class UAnimMontage* head3;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* head4;
+		class UAnimMontage* head4;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* falldown;
+		class UAnimMontage* falldown;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* death;
+		class UAnimMontage* death;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* block;
+		class UAnimMontage* block;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* punch;
+		class UAnimMontage* punch;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* jab;
+		class UAnimMontage* jab;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* uppercut;
+		class UAnimMontage* uppercut;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* kick;
+		class UAnimMontage* kick;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* highKick;
+		class UAnimMontage* highKick;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* lowKick;
+		class UAnimMontage* lowKick;
 
 	//좌우 이동입력 이벤트 처리함수
 	void Turn(float value);
@@ -87,62 +87,64 @@ public:
 	void AttackPunch();
 	void AttackKick();
 	UFUNCTION(BlueprintCallable)
-	void saveAttackCombo();
+		void saveAttackCombo();
 	UFUNCTION(BlueprintCallable)
-	void punchCombo();
+		void punchCombo();
 	UFUNCTION(BlueprintCallable)
-	void kickCombo();
+		void kickCombo();
 	UFUNCTION(BlueprintCallable)
-	void ResetCombo();
+		void ResetCombo();
 	UFUNCTION(BlueprintCallable)
-	void PlayerBlock(bool value);
+		void PlayerBlock(bool value);
 	UFUNCTION(BlueprintCallable)
-	void setTarget();
+		void setTarget();
 	//공격받은 애니메이션 플레이 함수
 	UFUNCTION(BlueprintCallable)
-	void HurtAnim0();
+		void HurtAnim0();
 	UFUNCTION(BlueprintCallable)
-	void HurtAnim1();
+		void HurtAnim1();
 	UFUNCTION(BlueprintCallable)
-	void HurtAnim2();
+		void HurtAnim2();
 	UFUNCTION(BlueprintCallable)
-	void HurtAnim3();
+		void HurtAnim3();
 	UFUNCTION(BlueprintCallable)
-	void HurtAnim4();
-	
+		void HurtAnim4();
+
 	//HJ 가 수정
 	UFUNCTION(BlueprintCallable)
-	void OnHitDamage();
+		void OnHitDamage();
 	UFUNCTION(BlueprintCallable)
-	void PlayerDamage();
+		void PlayerDamage();
 	UFUNCTION(BlueprintCallable)
-	void PlayerDie();
+		void PlayerDie();
 
 	//타게팅 된 적
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AHJ_Enemy* targetEnemy;
+		class AHJ_Enemy* targetEnemy;
 	//타겟 여부 확인
 	UPROPERTY(EditAnywhere)
-	bool targetLock = false;
+		bool targetLock = false;
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int32 hp = 5;
+		int32 hp = 5;
+	//죽음 확인
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isDead = false;
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere)
-	float PlayerdieSpeed = 50.0f;
+		float PlayerdieSpeed = 50.0f;
 
 	//공격 콤보
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int punchCount = 0;
+		int punchCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool IsAttacking = false;
+		bool IsAttacking = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool saveAttack = false;
+		bool saveAttack = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int kickCount = 0;
+		int kickCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool kickorPunch = true;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool Dead = false;
+		bool kickorPunch = true;
+
 };

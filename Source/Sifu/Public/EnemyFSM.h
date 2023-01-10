@@ -40,7 +40,7 @@ public:
 public:
 	//상태 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)// VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-	EEnemyState mState = EEnemyState::Idle;
+		EEnemyState mState = EEnemyState::Idle;
 
 	//대기 상태
 	void IdleState();
@@ -58,27 +58,29 @@ public:
 	//피격 시 재생 애님함수
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim0();
+		void DamageAnim0();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim1();
+		void DamageAnim1();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim2();
+		void DamageAnim2();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim3();
+		void DamageAnim3();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim4();
+		void DamageAnim4();
 	//타겟을 쫒아 갈 수 있니?
 	bool IsTargetTrace();
 
+	UFUNCTION(BlueprintCallable)
+		void OnDamageProcess();
 
 	//일정 시간 기다렸다가 이동 상태로 전환하고 싶다.
 	//대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
-	float idleDelayTime = 2;
+		float idleDelayTime = 2;
 
 	//경과 시간
 	float currentTime = 0;
@@ -95,7 +97,7 @@ public:
 
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
-	class APlayer_KYI* target;
+		class APlayer_KYI* target;
 
 	//공격 범위
 	UPROPERTY(EditAnywhere, Category = FSM)
@@ -105,31 +107,32 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackDelayTime = 2.0f;
 
-	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess();
+	//죽음 여부
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isDead = false;
 
 	//체력
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)
-	float maxHP = 10;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+		float maxHP = 10;
 	float currHP;
 	//피격 대기 시간
-	UPROPERTY(EditAnywhere,Category = FSM)
-	float damageDelayTime = 1.0f;
+	UPROPERTY(EditAnywhere, Category = FSM)
+		float damageDelayTime = 1.0f;
 
 	//아래로 사라지는 속도
-	UPROPERTY(EditAnywhere,Category= FSM)
-	float dieSpeed= 50.0f;
+	UPROPERTY(EditAnywhere, Category = FSM)
+		float dieSpeed = 50.0f;
 
 	//사용 중인 애니메이션 블루프린트
 	UPROPERTY()
-	class UHJ_EnemyAnim* anim;
+		class UHJ_EnemyAnim* anim;
 
 	//소유 액터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AHJ_Enemy* me;
+		class AHJ_Enemy* me;
 
-// 	Enemy 를 소유하고 있는 AIController
-// 	UPROPERTY()
-// 	class AAIController* ai;
+	// 	Enemy 를 소유하고 있는 AIController
+	// 	UPROPERTY()
+	// 	class AAIController* ai;
 
 };

@@ -38,7 +38,7 @@ void UEnemyFSM::BeginPlay()
 	me = Cast<AHJ_Enemy>(GetOwner());
 	me->GetCharacterMovement()->MaxWalkSpeed = 300;
 	//UEnemyAnim* 할당
-	
+
 	anim = Cast<UHJ_EnemyAnim>(me->GetMesh()->GetAnimInstance());
 
 	//compProjectile=CreateDefaultSubobject< UProjectileMovementComponent>(TEXT("compProject"));
@@ -58,7 +58,7 @@ void UEnemyFSM::BeginPlay()
 void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-		
+
 	switch (mState)
 	{
 	case EEnemyState::Idle:
@@ -84,27 +84,27 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 //대기 상태
 void UEnemyFSM::IdleState()
 {
-// 	//1. 시간이 흘렀으니까 
-// 	currentTime += GetWorld()->DeltaTimeSeconds;
-// 	//2. 만약 경과 시간이 대기 시간을 초과했다면
-// 	if (currentTime > idleDelayTime)
-// 	{
-// 	
-// 		//3. 이동 상태로 전환하고 싶다.
-// 		mState = EEnemyState::Move;
-// 		//경과 시간 초기화
-// 		currentTime = 0;
-// 
-// 		//Idle 애니메이션 재생
-// 	    //int32 index = FMath::RandRange(0,1);
-// 		//anim->PlayDamageAnim(TEXT("Move0"));
-// 
-// 
-// 		//애니메이션 상태 동기화 
-// 		anim->animState = mState;
-// 	}
+	// 	//1. 시간이 흘렀으니까 
+	// 	currentTime += GetWorld()->DeltaTimeSeconds;
+	// 	//2. 만약 경과 시간이 대기 시간을 초과했다면
+	// 	if (currentTime > idleDelayTime)
+	// 	{
+	// 	
+	// 		//3. 이동 상태로 전환하고 싶다.
+	// 		mState = EEnemyState::Move;
+	// 		//경과 시간 초기화
+	// 		currentTime = 0;
+	// 
+	// 		//Idle 애니메이션 재생
+	// 	    //int32 index = FMath::RandRange(0,1);
+	// 		//anim->PlayDamageAnim(TEXT("Move0"));
+	// 
+	// 
+	// 		//애니메이션 상태 동기화 
+	// 		anim->animState = mState;
+	// 	}
 
-//만약에 Player 를 쫓아 갈 수 있니? ( 내 시야에 보이면)
+	//만약에 Player 를 쫓아 갈 수 있니? ( 내 시야에 보이면)
 	if (IsTargetTrace())
 	{
 		//상태를 Move 로 전환
@@ -123,7 +123,7 @@ void UEnemyFSM::MoveState()
 	//1). 처음 위치 - 나의 위치 거리를 구한다.
 	float dist = FVector::Distance(originPos, me->GetActorLocation());
 
-	
+
 	//2). 만약에 dist 가 moveRange 보다 커지면 (움직일 수 있는 반경을 넘어갔다면)
 	if (dist > moveRange)
 	{
@@ -160,7 +160,7 @@ void UEnemyFSM::MoveState()
 void UEnemyFSM::AttackState()
 {
 	//목표: 일정 시간에 한 번씩 공격하고 싶다.
-	
+
 	//1. 시간이 흘러야 한다.
 	currentTime += GetWorld()->DeltaTimeSeconds;
 	//2. 공격 시간이 됐으니까
@@ -168,16 +168,18 @@ void UEnemyFSM::AttackState()
 	{
 
 		//3. 공격하고 싶다.
-		UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
+		//UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
 
-		target->OnHitDamage();
+		//target->OnHitDamage();
 
 		// 경과 시간 초기화
 		currentTime = 0;
 		//공격 애니메이션 랜덤으로 재생하기
-		int32 index = FMath::RandRange(0,3);
-		FString sectionName = FString::Printf(TEXT("Attack%d"),index);
-		anim->PlayDamageAnim(FName(*sectionName));
+		if (target->isDead == false) {//플레이어가 살아 있을때만 공격 하기
+			int32 index = FMath::RandRange(0, 3);
+			FString sectionName = FString::Printf(TEXT("Attack%d"), index);
+			anim->PlayDamageAnim(FName(*sectionName));
+		}
 
 		//anim->bAttackPlay = true;
 	}
@@ -194,9 +196,9 @@ void UEnemyFSM::AttackState()
 		//애니메이션 상태 동기화
 		anim->animState = mState;
 	}
-	
-	
-	
+
+
+
 }
 
 //피격 알림 이벤트 함수
@@ -209,7 +211,7 @@ void UEnemyFSM::OnDamageProcess()
 	{
 		//상태를 피격으로 전환
 		mState = EEnemyState::Damage;
-
+		isDead = true;
 		//플레이어한테 맞으면 뒤로 밀려난다
 		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector());
 		//me->SetActorLocation(s);
@@ -257,10 +259,10 @@ void UEnemyFSM::DamageState()
 //죽음 상태
 void UEnemyFSM::DieState()
 {
-	
+
 	//아직 죽음 애니메이션이 끝나지 않았다면 
 	//바닥까지 내려가지 않도록 처리
-	if ( anim->bDieDone == false )
+	if (anim->bDieDone == false)
 	{
 		//플레이어한테 맞으면 뒤로 밀려난다
 		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 5);
@@ -268,7 +270,7 @@ void UEnemyFSM::DieState()
 		return;
 	}
 
-	
+
 	//계속 아래로 내려가고 싶다. p=p0+vt
 	FVector p0 = me->GetActorLocation();
 	FVector p = p0 + FVector::DownVector * dieSpeed * GetWorld()->DeltaTimeSeconds;
@@ -305,32 +307,42 @@ void UEnemyFSM::ReturnPosState()
 //DamgeAnim0 번 호출 함수
 void  UEnemyFSM::DamageAnim0()
 {
-	anim->PlayDamageAnim(TEXT("Damage0"));
-	OnDamageProcess();
+	if (!isDead) {
+		anim->PlayDamageAnim(TEXT("Damage0"));
+		OnDamageProcess();
+	}
 }
 //DamgeAnim1 번 호출 함수
 void  UEnemyFSM::DamageAnim1()
 {
-	anim->PlayDamageAnim(TEXT("Damage1"));
-	OnDamageProcess();
+	if (!isDead) {
+		anim->PlayDamageAnim(TEXT("Damage1"));
+		OnDamageProcess();
+	}
 }
 //DamgeAnim2 번 호출 함수
 void  UEnemyFSM::DamageAnim2()
 {
-	anim->PlayDamageAnim(TEXT("Damage2"));
-	OnDamageProcess();
+	if (!isDead) {
+		anim->PlayDamageAnim(TEXT("Damage2"));
+		OnDamageProcess();
+	}
 }
 //DamgeAnim3 번 호출 함수
 void  UEnemyFSM::DamageAnim3()
 {
-	anim->PlayDamageAnim(TEXT("Damage3"));
-	OnDamageProcess();
+	if (!isDead) {
+		OnDamageProcess();
+		anim->PlayDamageAnim(TEXT("Damage3"));
+	}
 }
 //DamgeAnim4 번 호출 함수
 void  UEnemyFSM::DamageAnim4()
 {
-	anim->PlayDamageAnim(TEXT("Damage4"));
-	OnDamageProcess();
+	if (!isDead) {
+		OnDamageProcess();
+		anim->PlayDamageAnim(TEXT("Damage4"));
+	}
 }
 
 bool UEnemyFSM::IsTargetTrace()
@@ -376,5 +388,5 @@ bool UEnemyFSM::IsTargetTrace()
 	//false 로 반환
 	return false;
 
-	
+
 }
