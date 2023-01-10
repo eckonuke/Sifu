@@ -74,6 +74,8 @@ public:
 	//타겟을 쫒아 갈 수 있니?
 	bool IsTargetTrace();
 
+	UFUNCTION(BlueprintCallable)
+	void OnDamageProcess();
 
 	//일정 시간 기다렸다가 이동 상태로 전환하고 싶다.
 	//대기 시간
@@ -105,8 +107,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackDelayTime = 2.0f;
 
-	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess();
+	//죽음 여부
+	UPROPERTY(EditAnywhere)
+	bool isDead = false;
 
 	//체력
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)

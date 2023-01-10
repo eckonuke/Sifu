@@ -168,16 +168,18 @@ void UEnemyFSM::AttackState()
 	{
 
 		//3. 공격하고 싶다.
-		UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
+		//UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
 
-		target->OnHitDamage();
+		//target->OnHitDamage();
 
 		// 경과 시간 초기화
 		currentTime = 0;
 		//공격 애니메이션 랜덤으로 재생하기
-		int32 index = FMath::RandRange(0,3);
-		FString sectionName = FString::Printf(TEXT("Attack%d"),index);
-		anim->PlayDamageAnim(FName(*sectionName));
+		if (target->isDead == false) {//플레이어가 살아 있을때만 공격 하기
+			int32 index = FMath::RandRange(0, 3);
+			FString sectionName = FString::Printf(TEXT("Attack%d"), index);
+			anim->PlayDamageAnim(FName(*sectionName));
+		}
 
 		//anim->bAttackPlay = true;
 	}
@@ -209,7 +211,7 @@ void UEnemyFSM::OnDamageProcess()
 	{
 		//상태를 피격으로 전환
 		mState = EEnemyState::Damage;
-
+		isDead = true;
 		//플레이어한테 맞으면 뒤로 밀려난다
 		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector());
 		//me->SetActorLocation(s);
@@ -305,32 +307,42 @@ void UEnemyFSM::ReturnPosState()
 //DamgeAnim0 번 호출 함수
 void  UEnemyFSM::DamageAnim0()
 {
-	anim->PlayDamageAnim(TEXT("Damage0"));
-	OnDamageProcess();
+	if (!isDead) {
+		anim->PlayDamageAnim(TEXT("Damage0"));
+		OnDamageProcess();
+	}
 }
 //DamgeAnim1 번 호출 함수
 void  UEnemyFSM::DamageAnim1()
 {
-	anim->PlayDamageAnim(TEXT("Damage1"));
-	OnDamageProcess();
+	if (!isDead) {
+		anim->PlayDamageAnim(TEXT("Damage1"));
+		OnDamageProcess();
+	}
 }
 //DamgeAnim2 번 호출 함수
 void  UEnemyFSM::DamageAnim2()
 {
-	anim->PlayDamageAnim(TEXT("Damage2"));
-	OnDamageProcess();
+	if (!isDead) {
+		anim->PlayDamageAnim(TEXT("Damage2"));
+		OnDamageProcess();
+	}
 }
 //DamgeAnim3 번 호출 함수
 void  UEnemyFSM::DamageAnim3()
 {
-	anim->PlayDamageAnim(TEXT("Damage3"));
-	OnDamageProcess();
+	if (!isDead) {
+		OnDamageProcess();
+		anim->PlayDamageAnim(TEXT("Damage3"));
+	}
 }
 //DamgeAnim4 번 호출 함수
 void  UEnemyFSM::DamageAnim4()
 {
-	anim->PlayDamageAnim(TEXT("Damage4"));
-	OnDamageProcess();
+	if (!isDead) {
+		OnDamageProcess();
+		anim->PlayDamageAnim(TEXT("Damage4"));
+	}
 }
 
 bool UEnemyFSM::IsTargetTrace()

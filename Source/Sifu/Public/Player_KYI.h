@@ -128,6 +128,9 @@ public:
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 hp = 5;
+	//죽음 확인
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isDead = false;
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere)
 	float PlayerdieSpeed = 50.0f;
@@ -143,6 +146,5 @@ public:
 	int kickCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool kickorPunch = true;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool Dead = false;
+	
 };
