@@ -3,12 +3,12 @@
 
 #include "Player_KYI.h"
 #include <GameFramework/SpringArmComponent.h>
-#include <GameFramework/Character.h>
 #include <Camera/CameraComponent.h>
 #include <Components/SphereComponent.h>
 #include "HJ_Enemy.h"
 #include "EnemyFSM.h"
 #include <Engine/SkeletalMesh.h>
+#include <GameFramework/Character.h>
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
 
@@ -20,9 +20,6 @@
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
 #include <Animation/AnimMontage.h>
-#include <GameFramework/CharacterMovementComponent.h>
-#include "PlayerAnim.h"
-
 
 // Sets default values
 APlayer_KYI::APlayer_KYI()
@@ -85,7 +82,7 @@ APlayer_KYI::APlayer_KYI()
 	if (tempBlock.Succeeded()) {
 		block = tempBlock.Object;
 	}
-	//주먹 공격 애니메이션
+	//공격 애니메이션 주먹
 	ConstructorHelpers::FObjectFinder<UAnimMontage> tempPunch(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/regular-punch.regular-punch'"));
 	if (tempPunch.Succeeded()) {
 		punch = tempPunch.Object;
@@ -98,7 +95,7 @@ APlayer_KYI::APlayer_KYI()
 	if (tempUpper.Succeeded()) {
 		uppercut = tempUpper.Object;
 	}
-	//발차기 공격 애니메이션
+	//공격 애니메이션 발차기
 	ConstructorHelpers::FObjectFinder<UAnimMontage> tempKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/kick-regular_Montage.kick-regular_Montage'"));
 	if (tempKick.Succeeded()) {
 		kick = tempKick.Object;
@@ -127,7 +124,6 @@ void APlayer_KYI::Tick(float DeltaTime) {
 		AddMovementInput(direction);
 		direction = FVector::ZeroVector;
 	}
-	setTarget();
 }
 
 void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
@@ -149,9 +145,6 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	DECLARE_DELEGATE_OneParam(FBlock, bool);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Pressed, this, &APlayer_KYI::PlayerBlock, true);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Released, this, &APlayer_KYI::PlayerBlock, false);
-	DECLARE_DELEGATE_OneParam(FRun, bool);
-	PlayerInputComponent->BindAction<FRun>(TEXT("Run"), IE_Pressed, this, &APlayer_KYI::InputRun, true);
-	PlayerInputComponent->BindAction<FRun>(TEXT("Run"), IE_Released, this, &APlayer_KYI::InputRun, false);
 }
 
 void APlayer_KYI::Turn(float value) {
@@ -169,27 +162,20 @@ void APlayer_KYI::InputVertical(float value) {
 void APlayer_KYI::InputJump() {
 	Jump();
 }
-void APlayer_KYI::InputRun(bool run) {
-	if (run) 
-		GetCharacterMovement()->MaxWalkSpeed = 900;
-	else
-		GetCharacterMovement()->MaxWalkSpeed = 600;
-}
+
 void APlayer_KYI::setTarget() {
-	if (!targetLock) {
-		FVector startPos = camComp->GetComponentLocation();
-		FVector endPos = startPos + camComp->GetForwardVector() * 5000;
-		FHitResult hitinfo;
-		FCollisionQueryParams params;
-		params.AddIgnoredActor(this);
-		bool bHit = GetWorld()->LineTraceSingleByChannel(hitinfo, startPos, endPos, ECC_Pawn, params);
-		if (bHit) {
-			AHJ_Enemy* enem = Cast<AHJ_Enemy>(hitinfo.GetActor());
-			if (enem) {
-				targetEnemy = enem;
-				targetLock = true;
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *targetEnemy->GetName());
-			}
+	FVector startPos = camComp->GetComponentLocation();
+	FVector endPos = startPos + camComp->GetForwardVector()*5000;
+	FHitResult hitinfo;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitinfo, startPos, endPos, ECC_Visibility, params);
+	if (bHit) {
+		UE_LOG(LogTemp, Warning, TEXT("Hit Something"));
+		AHJ_Enemy* enem = Cast<AHJ_Enemy>(hitinfo.GetActor());
+		if (enem) {
+			targetEnemy = enem;
+			UE_LOG(LogTemp,Warning, TEXT("%s"), *targetEnemy->GetName());
 		}
 	}
 }
@@ -221,25 +207,18 @@ void APlayer_KYI::OnHitDamage() {
 
 //플레이어가 적을 타격
 void APlayer_KYI::PlayerDamage() {
-	if (targetLock) {
+	TArray<AActor*> enemys;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
+	for (int i = 0; i < enemys.Num(); i++)
+	{
 		//거리 계산 (Player - enemy)
-		FVector v = GetActorLocation() - targetEnemy->GetActorLocation();
-		if (v.Length() <= 300) {
-			targetEnemy->fsm->OnDamageProcess();
+		FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
+		float dist = v.Length();
+		if (dist < 300) {
+			AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
+			e->fsm->OnDamageProcess();
 		}
 	}
-	//TArray<AActor*> enemys;
-	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHJ_Enemy::StaticClass(), enemys);
-	//for (int i = 0; i < enemys.Num(); i++)
-	//{
-	//	//거리 계산 (Player - enemy)
-	//	FVector v = GetActorLocation() - enemys[i]->GetActorLocation();
-	//	float dist = v.Length();
-	//	if (dist < 300) {
-	//		AHJ_Enemy* e = Cast<AHJ_Enemy>(enemys[i]);
-	//		e->fsm->OnDamageProcess();
-	//	}
-	//}
 }
 
 //플레이어 죽음
@@ -290,17 +269,17 @@ void APlayer_KYI::punchCombo() {
 	{
 		case 0:
 		punchCount = 1;
-		//PlayerDamage();
+		PlayerDamage();
 		PlayAnimMontage(punch);
 		break;
 		case 1:
 		punchCount = 2;
-		//PlayerDamage();
+		PlayerDamage();
 		PlayAnimMontage(jab);
 		break;
 		case 2:
 		punchCount = 0;
-		//PlayerDamage();
+		PlayerDamage();
 		PlayAnimMontage(uppercut);
 		break;
 	}
@@ -310,17 +289,17 @@ void APlayer_KYI::kickCombo() {
 	{
 	case 0:
 		kickCount = 1;
-		//PlayerDamage();
+		PlayerDamage();
 		PlayAnimMontage(kick);
 		break;
 	case 1:
 		kickCount = 2;
-		//PlayerDamage();
+		PlayerDamage();
 		PlayAnimMontage(highKick);
 		break;
 	case 2:
 		kickCount = 0;
-		//PlayerDamage();
+		PlayerDamage();
 		PlayAnimMontage(lowKick);
 		break;
 	}

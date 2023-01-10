@@ -213,8 +213,8 @@ void UEnemyFSM::OnDamageProcess()
 		mState = EEnemyState::Damage;
 		isDead = true;
 		//플레이어한테 맞으면 뒤로 밀려난다
-		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector());
-		//me->SetActorLocation(s);
+		FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 100);
+		me->SetActorLocation(s);
 		currentTime = 0;
 
 	}
@@ -224,8 +224,7 @@ void UEnemyFSM::OnDamageProcess()
 		mState = EEnemyState::Die;
 		//캡슐 충돌체 비활성화
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//적이 죽으면 플레이어의 타겟 설정을 해제한다
-		target->targetLock = false;
+
 		//죽음 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Die0"));
 
@@ -265,8 +264,8 @@ void UEnemyFSM::DieState()
 	if ( anim->bDieDone == false )
 	{
 		//플레이어한테 맞으면 뒤로 밀려난다
-		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 5);
-		//me->SetActorLocation(s);
+		FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 5);
+		me->SetActorLocation(s);
 		return;
 	}
 

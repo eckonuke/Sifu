@@ -83,7 +83,6 @@ public:
 	void InputHorizontal(float value);
 	void InputVertical(float value);
 	void InputJump();
-	void InputRun(bool run);
 	void AttackPunch();
 	void AttackKick();
 	UFUNCTION(BlueprintCallable)
@@ -119,11 +118,8 @@ public:
 	void PlayerDie();
 
 	//타게팅 된 적
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AHJ_Enemy* targetEnemy;
-	//타겟 여부 확인
 	UPROPERTY(EditAnywhere)
-	bool targetLock = false;
+	class AHJ_Enemy* targetEnemy;
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
