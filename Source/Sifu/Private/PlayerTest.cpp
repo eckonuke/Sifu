@@ -52,68 +52,68 @@ APlayerTest::APlayerTest()
 	bUseControllerRotationYaw = true;
 
 	//애니메이션 블루프린트 가져오자
-	ConstructorHelpers::FClassFinder<UPlayerAnim> tempAnim(TEXT("AnimBlueprint'/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C'"));
+	ConstructorHelpers::FClassFinder<UPlayerAnim> tempAnim(TEXT("AnimBlueprint'/Game/Mannequin/Animations/ABP_SifuPlayer.ABP_SifuPlayer_C'"));
 	if (tempAnim.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
 
-	//피격 애니메이션
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempStomach(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
-	if (tempStomach.Succeeded()) {
-		stomach = tempStomach.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead2(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_2_Montage.Head_Hit_2_Montage'"));
-	if (tempHead2.Succeeded()) {
-		head2 = tempHead2.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead3(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_3_Montage.Head_Hit_3_Montage'"));
-	if (tempHead3.Succeeded()) {
-		head3 = tempHead3.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead4(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_4_Montage.Head_Hit_4_Montage'"));
-	if (tempHead4.Succeeded()) {
-		head4 = tempHead4.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempFallDown(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Sweep_Fall_Montage.Sweep_Fall_Montage'"));
-	if (tempFallDown.Succeeded()) {
-		falldown = tempFallDown.Object;
-	}
-	//죽음
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempDeath(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Death.Death'"));
-	if (tempDeath.Succeeded()) {
-		death = tempDeath.Object;
-	}
-	//방어
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempBlock(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Block_Hit_Montage.Block_Hit_Montage'"));
-	if (tempBlock.Succeeded()) {
-		block = tempBlock.Object;
-	}
-	//주먹 공격 애니메이션
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempPunch(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/regular-punch.regular-punch'"));
-	if (tempPunch.Succeeded()) {
-		punch = tempPunch.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempJab(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Lead_Jab_Montage.Lead_Jab_Montage'"));
-	if (tempJab.Succeeded()) {
-		jab = tempJab.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempUpper(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Uppercut_Montage.Uppercut_Montage'"));
-	if (tempUpper.Succeeded()) {
-		uppercut = tempUpper.Object;
-	}
-	//발차기 공격 애니메이션
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/kick-regular_Montage.kick-regular_Montage'"));
-	if (tempKick.Succeeded()) {
-		kick = tempKick.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempHighKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/kick-up_Montage.kick-up_Montage'"));
-	if (tempHighKick.Succeeded()) {
-		highKick = tempHighKick.Object;
-	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempLowKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Leg_Sweep_Montage.Leg_Sweep_Montage'"));
-	if (tempLowKick.Succeeded()) {
-		lowKick = tempLowKick.Object;
-	}
+	////피격 애니메이션
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempStomach(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Big_Stomach_Hit_Montage.Big_Stomach_Hit_Montage'"));
+	//if (tempStomach.Succeeded()) {
+	//	stomach = tempStomach.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead2(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_2_Montage.Head_Hit_2_Montage'"));
+	//if (tempHead2.Succeeded()) {
+	//	head2 = tempHead2.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead3(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_3_Montage.Head_Hit_3_Montage'"));
+	//if (tempHead3.Succeeded()) {
+	//	head3 = tempHead3.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempHead4(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Head_Hit_4_Montage.Head_Hit_4_Montage'"));
+	//if (tempHead4.Succeeded()) {
+	//	head4 = tempHead4.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempFallDown(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Sweep_Fall_Montage.Sweep_Fall_Montage'"));
+	//if (tempFallDown.Succeeded()) {
+	//	falldown = tempFallDown.Object;
+	//}
+	////죽음
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempDeath(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Death.Death'"));
+	//if (tempDeath.Succeeded()) {
+	//	death = tempDeath.Object;
+	//}
+	////방어
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempBlock(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Block_Hit_Montage.Block_Hit_Montage'"));
+	//if (tempBlock.Succeeded()) {
+	//	block = tempBlock.Object;
+	//}
+	////주먹 공격 애니메이션
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempPunch(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/regular-punch.regular-punch'"));
+	//if (tempPunch.Succeeded()) {
+	//	punch = tempPunch.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempJab(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Lead_Jab_Montage.Lead_Jab_Montage'"));
+	//if (tempJab.Succeeded()) {
+	//	jab = tempJab.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempUpper(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Uppercut_Montage.Uppercut_Montage'"));
+	//if (tempUpper.Succeeded()) {
+	//	uppercut = tempUpper.Object;
+	//}
+	////발차기 공격 애니메이션
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/kick-regular_Montage.kick-regular_Montage'"));
+	//if (tempKick.Succeeded()) {
+	//	kick = tempKick.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempHighKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/kick-up_Montage.kick-up_Montage'"));
+	//if (tempHighKick.Succeeded()) {
+	//	highKick = tempHighKick.Object;
+	//}
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> tempLowKick(TEXT("AnimMontage'/Game/Mannequin/Animations/h2H_Anim/Leg_Sweep_Montage.Leg_Sweep_Montage'"));
+	//if (tempLowKick.Succeeded()) {
+	//	lowKick = tempLowKick.Object;
+	//}
 }
 
 // Called when the game starts or when spawned
