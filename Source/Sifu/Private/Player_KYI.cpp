@@ -49,7 +49,7 @@ APlayer_KYI::APlayer_KYI()
 	bUseControllerRotationYaw = true;
 
 	//애니메이션 블루프린트 가져오자
-	ConstructorHelpers::FClassFinder<UPlayerAnim> tempAnim(TEXT("AnimBlueprint'/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C'"));
+	ConstructorHelpers::FClassFinder<UPlayerAnim> tempAnim(TEXT("AnimBlueprint'/Game/Mannequin/Animations/ABP_SifuPlayer.ABP_SifuPlayer_C'"));
 	if (tempAnim.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
