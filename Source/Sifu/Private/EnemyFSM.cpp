@@ -211,7 +211,6 @@ void UEnemyFSM::OnDamageProcess()
 	{
 		//상태를 피격으로 전환
 		mState = EEnemyState::Damage;
-		isDead = true;
 		//플레이어한테 맞으면 뒤로 밀려난다
 		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector());
 		//me->SetActorLocation(s);
@@ -220,6 +219,7 @@ void UEnemyFSM::OnDamageProcess()
 	}
 	else
 	{
+		isDead = true;
 		//상태를 죽음으로 전환
 		mState = EEnemyState::Die;
 		//캡슐 충돌체 비활성화
