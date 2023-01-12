@@ -41,7 +41,7 @@ public:
 public:
 	//상태 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)// VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-	EEnemyState mState = EEnemyState::Idle;
+		EEnemyState mState = EEnemyState::Idle;
 
 	//대기 상태
 	void IdleState();
@@ -54,26 +54,26 @@ public:
 	void DamageState();
 	//죽음상태
 	UFUNCTION(BlueprintCallable)
-	void DieState();
+		void DieState();
 	//리턴
 	void ReturnPosState();
 
 	//피격 시 재생 애님함수		
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim0();
+		void DamageAnim0();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim1();
+		void DamageAnim1();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim2();
+		void DamageAnim2();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim3();
+		void DamageAnim3();
 
 	UFUNCTION(BlueprintCallable)
-	void DamageAnim4();
+		void DamageAnim4();
 	//타겟을 쫒아 갈 수 있니?
 	bool IsTargetTrace();
 
@@ -81,7 +81,7 @@ public:
 	//일정 시간 기다렸다가 이동 상태로 전환하고 싶다.
 	//대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
-	float idleDelayTime = 2;
+		float idleDelayTime = 2;
 
 	//경과 시간
 	float currentTime = 0;
@@ -98,7 +98,7 @@ public:
 
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
-	class APlayer_KYI* target;
+		class APlayer_KYI* target;
 
 	//공격 범위
 	UPROPERTY(EditAnywhere, Category = FSM)
@@ -109,16 +109,16 @@ public:
 		float attackDelayTime = 2.0f;
 
 	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess();
+		void OnDamageProcess(float damage);
 
 	//체력
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)
-	float maxHP = 5;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
-	float currHP;
+		float maxHP = 100;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+		float currHP;
 	//피격 대기 시간
-	UPROPERTY(EditAnywhere,Category = FSM)
-	float damageDelayTime = 1.0f;
+	UPROPERTY(EditAnywhere, Category = FSM)
+		float damageDelayTime = 1.0f;
 
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere, Category = FSM)

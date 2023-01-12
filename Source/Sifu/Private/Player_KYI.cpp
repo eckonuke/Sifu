@@ -12,6 +12,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
 
+#include "Components/PrimitiveComponent.h"
 #include <Components/SphereComponent.h>
 #include "HJ_Enemy.h"
 #include "EnemyFSM.h"
@@ -34,11 +35,35 @@ APlayer_KYI::APlayer_KYI()
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 	}
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+
+	//왼손 Collision
+	leftHand = CreateDefaultSubobject<USphereComponent>(TEXT("LeftHand"));
+	leftHand->SetupAttachment(GetMesh(), TEXT("middle_03_l"));
+	leftHand->SetRelativeScale3D(FVector(0.05f));
+	leftHand->SetGenerateOverlapEvents(true);
+	leftHand->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+
+	//왼발 Collision
+	leftLeg = CreateDefaultSubobject<USphereComponent>(TEXT("LeftLeg"));
+	leftLeg->SetupAttachment(GetMesh(), TEXT("ball_l"));
+	leftLeg->SetRelativeScale3D(FVector(0.1f));
+	leftLeg->SetRelativeLocation(FVector(0));
+	leftHand->SetGenerateOverlapEvents(true);
+	leftLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+
+	//오른발 Collision
+	rightLeg = CreateDefaultSubobject<USphereComponent>(TEXT("RightLeg"));
+	rightLeg->SetupAttachment(GetMesh(), TEXT("ball_r"));
+	rightLeg->SetRelativeScale3D(FVector(0.1f));
+	rightLeg->SetRelativeLocation(FVector(0));
+	rightLeg->SetGenerateOverlapEvents(true);
+	rightLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
 
 	//springArm 컴포넌트 붙이기
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
-	springArmComp->SetRelativeLocation(FVector(0, 70, 90));
+	springArmComp->SetRelativeLocation(FVector(0, 0, 90));
 	springArmComp->TargetArmLength = 400;
 	springArmComp->bUsePawnControlRotation = true;
 
@@ -116,22 +141,41 @@ APlayer_KYI::APlayer_KYI()
 // Called when the game starts or when spawned
 void APlayer_KYI::BeginPlay() {
 	Super::BeginPlay();
+	currHp = maxHp;
 }
 
 // Called every frame
 void APlayer_KYI::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-
 	if (movementEnabled) {
 		direction = FTransform(GetControlRotation()).TransformVector(direction);
 		AddMovementInput(direction);
 		direction = FVector::ZeroVector;
 	}
-	setTarget();
+	leftHand->SetActive(false);
+	leftLeg->SetActive(false);
+	rightLeg->SetActive(false);
 }
 
 void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
 	Super::NotifyActorBeginOverlap(OtherActor);
+}
+
+void APlayer_KYI::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
+	targetEnemy = Cast<AHJ_Enemy>(OtherActor);
+	if (targetEnemy) {
+		FVector minDistance = targetEnemy->GetActorLocation() - GetActorLocation();
+		if (OverlappedComponent->GetName().Contains(TEXT("Hand"))) {
+			if (minDistance.Length() <= 150) {
+				targetEnemy->fsm->OnDamageProcess(handDamage);
+			}
+		}
+		else if (OverlappedComponent->GetName().Contains(TEXT("Leg"))) {
+			if (minDistance.Length() <= 150) {
+				targetEnemy->fsm->OnDamageProcess(legDamage);
+			}
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -175,27 +219,27 @@ void APlayer_KYI::InputRun(bool run) {
 	else
 		GetCharacterMovement()->MaxWalkSpeed = 600;
 }
-void APlayer_KYI::setTarget() {
-	if (!targetLock) {
-		FVector startPos = camComp->GetComponentLocation();
-		FVector endPos = startPos + camComp->GetForwardVector() * 5000;
-		FHitResult hitinfo;
-		FCollisionQueryParams params;
-		params.AddIgnoredActor(this);
-		bool bHit = GetWorld()->LineTraceSingleByChannel(hitinfo, startPos, endPos, ECC_Pawn, params);
-		if (bHit) {
-			AHJ_Enemy* enem = Cast<AHJ_Enemy>(hitinfo.GetActor());
-			if (enem) {
-				targetEnemy = enem;
-				targetLock = true;
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *targetEnemy->GetName());
-			}
-		}
-	}
-	else if (targetEnemy->fsm->currHP == 0) {
-		targetLock = false;
-	}
-}
+//void APlayer_KYI::setTarget() {
+//	if (!targetLock) {
+//		FVector startPos = camComp->GetComponentLocation();
+//		FVector endPos = startPos + camComp->GetForwardVector() * 5000;
+//		FHitResult hitinfo;
+//		FCollisionQueryParams params;
+//		params.AddIgnoredActor(this);
+//		bool bHit = GetWorld()->LineTraceSingleByChannel(hitinfo, startPos, endPos, ECC_Pawn, params);
+//		if (bHit) {
+//			AHJ_Enemy* enem = Cast<AHJ_Enemy>(hitinfo.GetActor());
+//			if (enem) {
+//				targetEnemy = enem;
+//				targetLock = true;
+//				UE_LOG(LogTemp, Warning, TEXT("%s"), *targetEnemy->GetName());
+//			}
+//		}
+//	}
+//	else if (targetEnemy->fsm->currHP == 0) {
+//		targetLock = false;
+//	}
+//}
 
 //공격 방어
 void APlayer_KYI::PlayerBlock(bool value) {
@@ -208,9 +252,9 @@ void APlayer_KYI::OnHitDamage() {
 	if (!isDead) {
 		if (!isBlocking) {
 			//체력 감소
-			hp--;
+			currHp--;
 			//만약에 체력이 없다면
-			if (hp <= 0) {
+			if (currHp <= 0) {
 				isDead = true;
 				//상태를 죽음으로 전환
 				PlayerDie();
@@ -228,7 +272,7 @@ void APlayer_KYI::PlayerDamage() {
 		//거리 계산 (Player - enemy)
 		FVector v = GetActorLocation() - targetEnemy->GetActorLocation();
 		if (v.Length() <= 300) {
-			targetEnemy->fsm->OnDamageProcess();
+			//targetEnemy->fsm->OnDamageProcess();
 		}
 	}
 	//TArray<AActor*> enemys;
@@ -294,17 +338,14 @@ void APlayer_KYI::punchCombo() {
 	{
 	case 0:
 		punchCount = 1;
-		//PlayerDamage();
 		PlayAnimMontage(punch);
 		break;
 	case 1:
 		punchCount = 2;
-		//PlayerDamage();
 		PlayAnimMontage(jab);
 		break;
 	case 2:
 		punchCount = 0;
-		//PlayerDamage();
 		PlayAnimMontage(uppercut);
 		break;
 	}
@@ -314,17 +355,14 @@ void APlayer_KYI::kickCombo() {
 	{
 	case 0:
 		kickCount = 1;
-		//PlayerDamage();
 		PlayAnimMontage(kick);
 		break;
 	case 1:
 		kickCount = 2;
-		//PlayerDamage();
 		PlayAnimMontage(highKick);
 		break;
 	case 2:
 		kickCount = 0;
-		//PlayerDamage();
 		PlayAnimMontage(lowKick);
 		break;
 	}
@@ -342,7 +380,7 @@ void APlayer_KYI::ResetCombo() {
 void APlayer_KYI::HurtAnim0() {
 	if (!isDead) {
 		PlayAnimMontage(stomach);
-		OnHitDamage();
+		//OnHitDamage();
 		ResetCombo();
 	}
 }
@@ -350,7 +388,7 @@ void APlayer_KYI::HurtAnim0() {
 void APlayer_KYI::HurtAnim1() {
 	if (!isDead) {
 		PlayAnimMontage(head2);
-		OnHitDamage();
+		//OnHitDamage();
 		ResetCombo();
 	}
 }
@@ -358,7 +396,7 @@ void APlayer_KYI::HurtAnim1() {
 void APlayer_KYI::HurtAnim2() {
 	if (!isDead) {
 		PlayAnimMontage(head3);
-		OnHitDamage();
+		//OnHitDamage();
 		ResetCombo();
 	}
 }
@@ -366,7 +404,7 @@ void APlayer_KYI::HurtAnim2() {
 void APlayer_KYI::HurtAnim3() {
 	if (!isDead) {
 		PlayAnimMontage(head4);
-		OnHitDamage();
+		//OnHitDamage();
 		ResetCombo();
 	}
 }
@@ -374,7 +412,7 @@ void APlayer_KYI::HurtAnim3() {
 void APlayer_KYI::HurtAnim4() {
 	if (!isDead) {
 		PlayAnimMontage(falldown);
-		OnHitDamage();
+		//OnHitDamage();
 		ResetCombo();
 	}
 }
