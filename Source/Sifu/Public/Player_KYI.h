@@ -127,7 +127,7 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 hp = 5;
+		int32 hp = 500;
 	//죽음 확인
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isDead = false;
