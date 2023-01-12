@@ -336,7 +336,8 @@ void UEnemyFSM::DieState()
 		AActor* actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyManager::StaticClass());
 		AEnemyManager* am = Cast<AEnemyManager>(actor);
 		//찾은 놈에서enemyArray 에 나를 다시 담자
-		am->enemyArray.Add(me);
+		if(am)
+			am->enemyArray.Add(me);
 
 		//currHP = MaxHP 로CCC
 		currHP = maxHP;

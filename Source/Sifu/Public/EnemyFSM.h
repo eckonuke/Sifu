@@ -113,7 +113,7 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)
-	float maxHP = 2;
+	float maxHP = 5;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
 	float currHP;
 	//피격 대기 시간

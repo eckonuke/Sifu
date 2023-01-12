@@ -192,6 +192,9 @@ void APlayer_KYI::setTarget() {
 			}
 		}
 	}
+	else if (targetEnemy->fsm->currHP == 0) {
+		targetLock = false;
+	}
 }
 
 //공격 방어
