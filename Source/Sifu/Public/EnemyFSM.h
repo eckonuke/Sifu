@@ -13,6 +13,7 @@ enum class EEnemyState :uint8
 {
 	Idle,
 	Move,
+	Patrol,
 	Attack,
 	Damage,
 	Die,
@@ -46,16 +47,18 @@ public:
 	void IdleState();
 	//이동 상태
 	void MoveState();
+	void PatrolState();
 	//공격상태
 	void AttackState();
 	//피격 상태
 	void DamageState();
 	//죽음상태
+	UFUNCTION(BlueprintCallable)
 	void DieState();
 	//리턴
 	void ReturnPosState();
 
-	//피격 시 재생 애님함수
+	//피격 시 재생 애님함수		
 
 	UFUNCTION(BlueprintCallable)
 	void DamageAnim0();
@@ -110,26 +113,32 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)
-	float maxHP = 5;
+	float maxHP = 2;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
 	float currHP;
 	//피격 대기 시간
 	UPROPERTY(EditAnywhere,Category = FSM)
 	float damageDelayTime = 1.0f;
 
 	//아래로 사라지는 속도
-	UPROPERTY(EditAnywhere,Category= FSM)
-	float dieSpeed= 50.0f;
+	UPROPERTY(EditAnywhere, Category = FSM)
+		float dieSpeed = 50.0f;
 
 	//사용 중인 애니메이션 블루프린트
 	UPROPERTY()
-	class UHJ_EnemyAnim* anim;
+		class UHJ_EnemyAnim* anim;
 
 	//소유 액터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AHJ_Enemy* me;
+		class AHJ_Enemy* me;
 
-// 	Enemy 를 소유하고 있는 AIController
-// 	UPROPERTY()
-// 	class AAIController* ai;
+	// 	Enemy 를 소유하고 있는 AIController
+	UPROPERTY()
+		class AAIController* ai;
+
+	//길 찾기 수행시 랜덤 위치
+	FVector randomPos;
+	//랜덤 위치 가져오기
+	bool GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest);
 
 };

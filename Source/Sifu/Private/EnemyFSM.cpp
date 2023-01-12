@@ -9,6 +9,9 @@
 #include "HJ_EnemyAnim.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <AIModule/Classes/AIController.h>
+#include <NavigationSystem.h>
+#include "EnemyManager.h"
 
 
 
@@ -49,8 +52,10 @@ void UEnemyFSM::BeginPlay()
 	//처음 위치 셋팅
 	originPos = me->GetActorLocation();
 
-	//AIController
-}
+	//AIController 할당하기
+	ai = Cast<AAIController>(me->GetController());
+
+	}
 
 
 
@@ -105,14 +110,18 @@ void UEnemyFSM::IdleState()
 // 	}
 
 //만약에 Player 를 쫓아 갈 수 있니? ( 내 시야에 보이면)
-	if (IsTargetTrace())
+	currentTime += GetWorld()->DeltaTimeSeconds;
+	//if (IsTargetTrace())	
+	if (currentTime > idleDelayTime)
 	{
+		currentTime = 0;
 		//상태를 Move 로 전환
 		mState = EEnemyState::Move;
 		//애니메이션 상태 동기화 
 		anim->animState = mState;
+		//최초 랜덤한 위치 정해주기
+		GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
 	}
-
 }
 //이동 상태
 void UEnemyFSM::MoveState()
@@ -134,9 +143,10 @@ void UEnemyFSM::MoveState()
 	//타깃과 가까워지면 공격 상태로 전환하고 싶다.
 	// 
 	//1. 만약 거리가 공격 범위 안에 들어오면 
-	if (dir.Length() < attackRange)
+	else if (dir.Length() < attackRange)
 	{
-		//anim->StopAllMontages(currentTime);
+		ai->StopMovement();
+		
 		//2. 공격 상태로 전환하고 싶다.
 		mState = EEnemyState::Attack;
 
@@ -149,12 +159,53 @@ void UEnemyFSM::MoveState()
 		//공격 상태 전환 시 대기 시간이 바로 끝나도록 처리
 		currentTime = attackDelayTime;
 	}
-
 	else
 	{
 		//3. 그 방향으로 이동하고 싶다.+ (정규화)방향을 유지하되 크기가 1만큼의 방향?
-		me->AddMovementInput(dir.GetSafeNormal());
+			//me->AddMovementInput(dir.GetSafeNormal());
+		FVector destination = target->GetActorLocation();
+
+
+		//NavigationSystem 객체 얻어오기
+		auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+		//목적지 길 찾기 경로 데이터 검색
+		FPathFindingQuery query;
+		FAIMoveRequest req;
+		//목적지에서 인지할 수 있는 범위
+		req.SetAcceptanceRadius(3);
+		req.SetGoalLocation(destination);
+		//길 찾기 위한 쿼리 생성
+		ai->BuildPathfindingQuery(req, query);
+		//길 찾기 결과 가져오기
+		FPathFindingResult r = ns->FindPathSync(query);
+		//목적지 까지의 길찾기 성공 여부 확인
+		if (r.Result == ENavigationQueryResult::Success && IsTargetTrace())
+		{
+			//타깃 쪽으로 이동 
+			ai->MoveToLocation(destination);
+
+		}
+		else
+		{
+			//랜덤 위치로 이동
+			auto result = ai->MoveToLocation(randomPos);
+			//목적지에 도착하면
+			if (result == EPathFollowingRequestResult::AlreadyAtGoal)
+			{
+				//상태를 Move 로 전환
+				mState = EEnemyState::Idle;
+				//애니메이션 상태 동기화 
+				anim->animState = mState;
+				//새로운 랜덤 위치 가져오기
+				//GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
+			}
+		}
 	}
+}
+
+void UEnemyFSM::PatrolState()
+{
+	
 }
 //공격 상태
 void UEnemyFSM::AttackState()
@@ -190,9 +241,9 @@ void UEnemyFSM::AttackState()
 	{
 		//3. 상태를 이동으로 전환하고 싶다.
 		mState = EEnemyState::Move;
-		//anim->PlayDamageAnim(TEXT("Move0"));
 		//애니메이션 상태 동기화
 		anim->animState = mState;
+		GetRandomPositionInNavMesh(me->GetActorLocation(),500,randomPos);
 	}
 	
 	
@@ -229,6 +280,7 @@ void UEnemyFSM::OnDamageProcess()
 	}
 	//애니메이션 상태 동기화
 	anim->animState = mState;
+	ai->StopMovement();
 }
 //피격 상태
 void UEnemyFSM::DamageState()
@@ -277,27 +329,58 @@ void UEnemyFSM::DieState()
 	if (p.Z < -200.0f)
 	{
 		//2. 제거시킨다
-		me->Destroy();
+		//me->Destroy();
+		//나를 비활성화
+		me->SetActive(false);
+		//enemyManager 찾자
+		AActor* actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyManager::StaticClass());
+		AEnemyManager* am = Cast<AEnemyManager>(actor);
+		//찾은 놈에서enemyArray 에 나를 다시 담자
+		am->enemyArray.Add(me);
+
+		//currHP = MaxHP 로CCC
+		currHP = maxHP;
+		//상태를 Idle
+		mState = EEnemyState::Idle;
+		// 몽타주를 멈춰준다
+		me->StopAnimMontage();
+		//bDieMove 를 false 로 해준다.
+		anim->bDieDone = false;
+	}
+	//3. 그렇지 않으면 해당 위치로 셋팅한다
+	else
+	{
+		me->SetActorLocation(p);
 	}
 }
 
 void UEnemyFSM::ReturnPosState()
 {
-	//1. 나 ---> 처음 위치를 향하는 방향을 구한다.
-	FVector dir = originPos - me->GetActorLocation();
-
-	// 	3. 만약에 나--->처음 위치 거리가 10 보다 작아지면
-	if (dir.Length() < 10)
+	//타깃 쪽으로 이동 
+	EPathFollowingRequestResult::Type result = ai->MoveToLocation(originPos);
+	//목적지에 도착하면
+	if (result == EPathFollowingRequestResult::AlreadyAtGoal)
 	{
-		//4. idle 상태로 전환
+		//	//4. idle 상태로 전환
 		mState = EEnemyState::Idle;
+		anim->animState = mState;
 	}
-	//그렇지 않으면
-	else
-	{
-		//그 방향으로 이동한다.
-		me->AddMovementInput(dir.GetSafeNormal());
-	}
+
+	////1. 나 ---> 처음 위치를 향하는 방향을 구한다.
+	//FVector dir = originPos - me->GetActorLocation();
+
+	//// 	3. 만약에 나--->처음 위치 거리가 10 보다 작아지면
+	//if (dir.Length() < 10)
+	//{
+	//	//4. idle 상태로 전환
+	//	mState = EEnemyState::Idle;
+	//}
+	////그렇지 않으면
+	//else
+	//{
+	//	//그 방향으로 이동한다.
+	//	me->AddMovementInput(dir.GetSafeNormal());
+	//}
 }
 
 
@@ -344,7 +427,7 @@ bool UEnemyFSM::IsTargetTrace()
 
 	//4. 만약에 3번에 나온 값이 30 보다 작고 (시야각 60)
 	//나 - 타겟 과의 거리가 traceRange 보다 작으면
-	if (degree < 30 && dir.Length() < traceRange)
+	if (degree < 30)// && dir.Length() < traceRange)
 	{
 		//return true;
 
@@ -374,6 +457,15 @@ bool UEnemyFSM::IsTargetTrace()
 	}
 	//false 로 반환
 	return false;
+}
 
-	
+//랜덤 위치 가져오기
+bool UEnemyFSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest)
+{
+	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FNavLocation loc;
+	bool result = ns->GetRandomReachablePointInRadius(centerLocation,radius,loc);
+	dest = loc.Location;
+	return result;
+
 }

@@ -80,7 +80,7 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int32 hp = 5;
+	int32 hp = 5000;
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere)
 	float PlayerdieSpeed = 50.0f;

@@ -3,6 +3,10 @@
 
 #include "HJ_Enemy.h"
 #include "EnemyFSM.h"
+#include <GameFramework/Character.h>
+#include <Components/InputComponent.h>
+#include <Components/CapsuleComponent.h>
+#include <GameFramework/CharacterMovementComponent.h>
 
 // Sets default values 
 AHJ_Enemy::AHJ_Enemy()
@@ -31,15 +35,21 @@ AHJ_Enemy::AHJ_Enemy()
 	{
 		GetMesh()->SetAnimInstanceClass(tempClass.Class);
 	}
-	compProjectile = CreateDefaultSubobject< UProjectileMovementComponent>(TEXT("compProject"));
+	
+
+	//월드에 배치되거나 스폰될 때 자동으로
+	//AIController 부터 Possess 될 수 있도록 설정
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+
 }
 
 // Called when the game starts or when spawned
 void AHJ_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
-
+	//움직이는 방향으로 몸을 자동으로 회전하라는 옵션
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 // Called every frame
@@ -54,4 +64,31 @@ void AHJ_Enemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AHJ_Enemy::SetActive(bool bActive)
+{
+	//만약에 bActive 가 true 라면 /활성화
+	if (bActive)
+	{
+		//충돌활성
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		//생성 위치 재설정
+		fsm->originPos = GetActorLocation();
+
+	}
+	//비활성화
+	else
+	{
+		//총돌 안되게 셋팅
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	//메쉬 비활성화
+	GetMesh()->SetActive(bActive);
+	//메쉬를 보이게  / 안보이게
+	GetMesh()->SetVisibility(bActive);
+	//캐릭터 무브먼트 활성 /비활성
+	GetCharacterMovement()->SetActive(bActive);
+	//fsm 활성 /비활성
+	fsm->SetActive(bActive);
 }
