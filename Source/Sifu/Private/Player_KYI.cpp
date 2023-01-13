@@ -42,7 +42,7 @@ APlayer_KYI::APlayer_KYI()
 	leftHand->SetupAttachment(GetMesh(), TEXT("middle_03_l"));
 	leftHand->SetRelativeScale3D(FVector(0.5f));
 	leftHand->SetGenerateOverlapEvents(true);
-	leftHand->SetCollisionProfileName(TEXT("NoCollision"));
+	leftHand->SetCollisionProfileName(TEXT("DamagePreset"));
 
 	//왼발 Collision
 	leftLeg = CreateDefaultSubobject<USphereComponent>(TEXT("LeftLeg"));
@@ -50,7 +50,7 @@ APlayer_KYI::APlayer_KYI()
 	leftLeg->SetRelativeScale3D(FVector(0.5f));
 	leftLeg->SetRelativeLocation(FVector(0));
 	leftLeg->SetGenerateOverlapEvents(true);
-	leftLeg->SetCollisionProfileName(TEXT("NoCollision"));
+	leftLeg->SetCollisionProfileName(TEXT("DamagePreset"));
 
 	//오른발 Collision
 	rightLeg = CreateDefaultSubobject<USphereComponent>(TEXT("RightLeg"));
@@ -58,7 +58,7 @@ APlayer_KYI::APlayer_KYI()
 	rightLeg->SetRelativeScale3D(FVector(0.5f));
 	rightLeg->SetRelativeLocation(FVector(0));
 	rightLeg->SetGenerateOverlapEvents(true);
-	rightLeg->SetCollisionProfileName(TEXT("NoCollision"));
+	rightLeg->SetCollisionProfileName(TEXT("DamagePreset"));
 
 	//springArm 컴포넌트 붙이기
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
@@ -145,6 +145,7 @@ void APlayer_KYI::BeginPlay() {
 	leftHand->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
 	leftLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
 	rightLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+	
 }
 
 // Called every frame
@@ -294,6 +295,9 @@ void APlayer_KYI::PlayerDie()
 }
 
 void APlayer_KYI::AttackPunch() {
+	leftHand->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	leftLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	rightLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	movementEnabled = false;
 	kickorPunch = true;
 	if (IsAttacking) {
@@ -306,6 +310,9 @@ void APlayer_KYI::AttackPunch() {
 }
 
 void APlayer_KYI::AttackKick() {
+	leftHand->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	leftLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	rightLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	movementEnabled = false;
 	kickorPunch = false;
 	if (IsAttacking) {
@@ -328,9 +335,12 @@ void APlayer_KYI::saveAttackCombo() {
 			kickCombo();
 		}
 	}
-	leftHand->SetCollisionProfileName(TEXT("NoCollision"));
+	/*leftHand->SetCollisionProfileName(TEXT("NoCollision"));
 	leftLeg->SetCollisionProfileName(TEXT("NoCollision"));
-	rightLeg->SetCollisionProfileName(TEXT("NoCollision"));
+	rightLeg->SetCollisionProfileName(TEXT("NoCollision"));*/
+	leftHand->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	leftLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	rightLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 }
 
 //플레이어 콤보 애니메이션 스위치
