@@ -40,25 +40,25 @@ APlayer_KYI::APlayer_KYI()
 	//왼손 Collision
 	leftHand = CreateDefaultSubobject<USphereComponent>(TEXT("LeftHand"));
 	leftHand->SetupAttachment(GetMesh(), TEXT("middle_03_l"));
-	leftHand->SetRelativeScale3D(FVector(0.05f));
+	leftHand->SetRelativeScale3D(FVector(0.5f));
 	leftHand->SetGenerateOverlapEvents(true);
-	leftHand->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+	leftHand->SetCollisionProfileName(TEXT("NoCollision"));
 
 	//왼발 Collision
 	leftLeg = CreateDefaultSubobject<USphereComponent>(TEXT("LeftLeg"));
 	leftLeg->SetupAttachment(GetMesh(), TEXT("ball_l"));
-	leftLeg->SetRelativeScale3D(FVector(0.1f));
+	leftLeg->SetRelativeScale3D(FVector(0.5f));
 	leftLeg->SetRelativeLocation(FVector(0));
-	leftHand->SetGenerateOverlapEvents(true);
-	leftLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+	leftLeg->SetGenerateOverlapEvents(true);
+	leftLeg->SetCollisionProfileName(TEXT("NoCollision"));
 
 	//오른발 Collision
 	rightLeg = CreateDefaultSubobject<USphereComponent>(TEXT("RightLeg"));
 	rightLeg->SetupAttachment(GetMesh(), TEXT("ball_r"));
-	rightLeg->SetRelativeScale3D(FVector(0.1f));
+	rightLeg->SetRelativeScale3D(FVector(0.5f));
 	rightLeg->SetRelativeLocation(FVector(0));
 	rightLeg->SetGenerateOverlapEvents(true);
-	rightLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+	rightLeg->SetCollisionProfileName(TEXT("NoCollision"));
 
 	//springArm 컴포넌트 붙이기
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
@@ -142,6 +142,9 @@ APlayer_KYI::APlayer_KYI()
 void APlayer_KYI::BeginPlay() {
 	Super::BeginPlay();
 	currHp = maxHp;
+	leftHand->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+	leftLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
+	rightLeg->OnComponentBeginOverlap.AddDynamic(this, &APlayer_KYI::BeginOverlap);
 }
 
 // Called every frame
@@ -164,16 +167,11 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
 void APlayer_KYI::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	targetEnemy = Cast<AHJ_Enemy>(OtherActor);
 	if (targetEnemy) {
-		FVector minDistance = targetEnemy->GetActorLocation() - GetActorLocation();
-		if (OverlappedComponent->GetName().Contains(TEXT("Hand"))) {
-			if (minDistance.Length() <= 150) {
-				targetEnemy->fsm->OnDamageProcess(handDamage);
-			}
+		if (OverlappedComponent->GetName().Contains(TEXT("hand"))) {
+			//targetEnemy->fsm->OnDamageProcess(handDamage);
 		}
-		else if (OverlappedComponent->GetName().Contains(TEXT("Leg"))) {
-			if (minDistance.Length() <= 150) {
-				targetEnemy->fsm->OnDamageProcess(legDamage);
-			}
+		else if (OverlappedComponent->GetName().Contains(TEXT("leg"))) {
+			//targetEnemy->fsm->OnDamageProcess(legDamage);
 		}
 	}
 }
@@ -248,11 +246,11 @@ void APlayer_KYI::PlayerBlock(bool value) {
 }
 
 //플레이어가 공격을 받았다
-void APlayer_KYI::OnHitDamage() {
+void APlayer_KYI::OnHitDamage(float damage) {
 	if (!isDead) {
 		if (!isBlocking) {
 			//체력 감소
-			currHp--;
+			currHp -= damage;
 			//만약에 체력이 없다면
 			if (currHp <= 0) {
 				isDead = true;
@@ -330,6 +328,9 @@ void APlayer_KYI::saveAttackCombo() {
 			kickCombo();
 		}
 	}
+	leftHand->SetCollisionProfileName(TEXT("NoCollision"));
+	leftLeg->SetCollisionProfileName(TEXT("NoCollision"));
+	rightLeg->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 //플레이어 콤보 애니메이션 스위치
@@ -338,11 +339,11 @@ void APlayer_KYI::punchCombo() {
 	{
 	case 0:
 		punchCount = 1;
-		PlayAnimMontage(punch);
+		PlayAnimMontage(jab);
 		break;
 	case 1:
 		punchCount = 2;
-		PlayAnimMontage(jab);
+		PlayAnimMontage(punch);
 		break;
 	case 2:
 		punchCount = 0;

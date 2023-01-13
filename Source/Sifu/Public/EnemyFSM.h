@@ -59,6 +59,8 @@ public:
 	void ReturnPosState();
 
 	//피격 시 재생 애님함수		
+	UFUNCTION(BlueprintCallable)
+	void DamageAnim(int32 attackIdx);
 
 	UFUNCTION(BlueprintCallable)
 		void DamageAnim0();
@@ -103,17 +105,19 @@ public:
 	//공격 범위
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackRange = 100.0f;
+	UPROPERTY(EditAnywhere, Category = FSM)
+		float attackDamage = 10;
 
 	//공격 대기 시간
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackDelayTime = 2.0f;
 
 	UFUNCTION(BlueprintCallable)
-		void OnDamageProcess(float damage);
+		void OnDamageProcess(float damage, int32 animIdx);
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
-		float maxHP = 100;
+		float maxHP = 10;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
 		float currHP;
 	//피격 대기 시간
@@ -140,5 +144,4 @@ public:
 	FVector randomPos;
 	//랜덤 위치 가져오기
 	bool GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest);
-
 };

@@ -217,7 +217,7 @@ void UEnemyFSM::AttackState()
 		//3. 공격하고 싶다.
 		UE_LOG(LogTemp, Warning, TEXT("Attack!!!"));
 
-		target->OnHitDamage();
+		target->OnHitDamage(target->legDamage);
 
 		// 경과 시간 초기화
 		currentTime = 0;
@@ -244,8 +244,10 @@ void UEnemyFSM::AttackState()
 }
 
 //피격 알림 이벤트 함수
-void UEnemyFSM::OnDamageProcess(float damage)
+void UEnemyFSM::OnDamageProcess(float damage, int32 animIdx)
 {
+	if(mState == EEnemyState::Die) return;
+
 	//체력 감소
 	currHP -= damage;
 	//만약 체력이 남아있다면 
@@ -258,19 +260,22 @@ void UEnemyFSM::OnDamageProcess(float damage)
 		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 100);
 		//me->SetActorLocation(s);
 		currentTime = 0;
-
+		
+		FString s = FString::Printf(TEXT("Damage%d"), animIdx);
+		anim->PlayDamageAnim(FName(*s));
 	}
 	else
 	{
 		//상태를 죽음으로 전환
 		mState = EEnemyState::Die;
 		//캡슐 충돌체 비활성화
-		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		me->GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
 
 		//죽음 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Die0"));
 
 	}
+	UE_LOG(LogTemp, Warning, TEXT("curr HP : %f"), currHP);
 	//애니메이션 상태 동기화
 	anim->animState = mState;
 	ai->StopMovement();
@@ -284,8 +289,6 @@ void UEnemyFSM::DamageState()
 	//2. 만약 경과 시간이 대기 시간을 초과했다면
 	if (currentTime > damageDelayTime)
 	{
-
-
 		//3. 대기 상태로 전환하고 싶다.
 		mState = EEnemyState::Idle;
 		//경과 시간 초기화
@@ -378,36 +381,46 @@ void UEnemyFSM::ReturnPosState()
 	//}
 }
 
-
+void UEnemyFSM::DamageAnim(int32 attackIdx)
+{
+	float damage = target->legDamage;
+	switch (attackIdx)
+	{
+		case 0: case 3:
+		damage = target->handDamage;
+		break;
+	}
+	OnDamageProcess(damage, attackIdx);
+}
 //DamgeAnim0 번 호출 함수
 void  UEnemyFSM::DamageAnim0()
 {
-	anim->PlayDamageAnim(TEXT("Damage0"));
-	//OnDamageProcess();
+	//anim->PlayDamageAnim(TEXT("Damage0"));
+	OnDamageProcess(target->handDamage, 0);
 }
 //DamgeAnim1 번 호출 함수
 void  UEnemyFSM::DamageAnim1()
 {
-	anim->PlayDamageAnim(TEXT("Damage1"));
-	//OnDamageProcess();
+	//anim->PlayDamageAnim(TEXT("Damage1"));
+	OnDamageProcess(target->legDamage, 1);
 }
 //DamgeAnim2 번 호출 함수
 void  UEnemyFSM::DamageAnim2()
 {
-	anim->PlayDamageAnim(TEXT("Damage2"));
-	//OnDamageProcess();
+	//anim->PlayDamageAnim(TEXT("Damage2"));
+	OnDamageProcess(target->legDamage, 2);
 }
 //DamgeAnim3 번 호출 함수
 void  UEnemyFSM::DamageAnim3()
 {
-	anim->PlayDamageAnim(TEXT("Damage3"));
-	//OnDamageProcess();
+	//anim->PlayDamageAnim(TEXT("Damage3"));
+	OnDamageProcess(target->handDamage, 3);
 }
 //DamgeAnim4 번 호출 함수
 void  UEnemyFSM::DamageAnim4()
 {
-	anim->PlayDamageAnim(TEXT("Damage4"));
-	//OnDamageProcess();
+	//anim->PlayDamageAnim(TEXT("Damage4"));
+	OnDamageProcess(target->legDamage, 4);
 }
 
 bool UEnemyFSM::IsTargetTrace()

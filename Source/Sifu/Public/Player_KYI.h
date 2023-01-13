@@ -127,7 +127,7 @@ public:
 
 	//HJ 가 수정
 	UFUNCTION(BlueprintCallable)
-		void OnHitDamage();
+		void OnHitDamage(float damage);
 	UFUNCTION(BlueprintCallable)
 		void PlayerDamage();
 	UFUNCTION(BlueprintCallable)
@@ -144,7 +144,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		int32 currHp = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 maxHp = 100;
+		int32 maxHp = 500;
 	//죽음 확인
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isDead = false;

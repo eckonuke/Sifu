@@ -81,7 +81,7 @@ void AHJ_Enemy::SetActive(bool bActive)
 	//비활성화
 	else
 	{
-		//총돌 안되게 셋팅
+		//충돌 안되게 셋팅
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	//메쉬 비활성화

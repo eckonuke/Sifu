@@ -45,9 +45,8 @@ void AEnemyManager::BeginPlay()
 	FindSpawnPoint();
 	
 	//적을 미리 10개 만들자
-	for (int32 i = 0; i < 5; i++)
+	for (int32 i = 0; i < 10; i++)
 	{
-
 		//어떤 상황이던 무조건 생성한다는 옵션
 		FActorSpawnParameters param;
 		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -59,9 +58,6 @@ void AEnemyManager::BeginPlay()
 
 		//생성된 적을 탄창(배열)에 담자
 		enemyArray.Add(e);
-
-
-
 	}
 	
 }
@@ -153,7 +149,4 @@ void  AEnemyManager::FindSpawnPoint()
 // 		{	//spawnPoint 에 추가한다.
 // 			spawnPoints.Add(actors[i]);
 // 		}
-
-
 }
-
