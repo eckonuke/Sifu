@@ -97,6 +97,9 @@ public:
 	//처음 위치를 담아 놓을 변수
 	FVector originPos;
 
+	//죽음소리
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USoundBase* deathSound;
 
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
@@ -117,7 +120,7 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
-		float maxHP = 10;
+		float maxHP = 50;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
 		float currHP;
 	//피격 대기 시간

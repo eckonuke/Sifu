@@ -23,6 +23,7 @@
 #include <Animation/AnimMontage.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include "PlayerAnim.h"
+#include <Sound/SoundBase.h>
 
 
 // Sets default values
@@ -77,6 +78,11 @@ APlayer_KYI::APlayer_KYI()
 	ConstructorHelpers::FClassFinder<UPlayerAnim> tempAnim(TEXT("AnimBlueprint'/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C'"));
 	if (tempAnim.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
+	}
+
+	ConstructorHelpers::FObjectFinder<USoundBase> tempSound(TEXT("SoundWave'/Game/Audio/MaleA/voice_male_grunt_pain_death_03.voice_male_grunt_pain_death_03'"));
+	if (tempSound.Succeeded()) {
+		deathSound = tempSound.Object;
 	}
 
 	//피격 애니메이션
@@ -292,6 +298,7 @@ void APlayer_KYI::PlayerDamage() {
 void APlayer_KYI::PlayerDie()
 {
 	PlayAnimMontage(death);
+	UGameplayStatics::PlaySound2D(GetWorld(), deathSound);
 }
 
 void APlayer_KYI::AttackPunch() {

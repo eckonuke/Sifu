@@ -64,6 +64,8 @@ public:
 		bool isBlocking = false;
 	//이동방향
 	FVector direction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USoundBase* deathSound;
 	//피격 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UAnimMontage* stomach;
@@ -144,7 +146,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		int32 currHp = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 maxHp = 500;
+		int32 maxHp = 100;
 	//죽음 확인
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isDead = false;

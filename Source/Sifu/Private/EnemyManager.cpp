@@ -125,7 +125,6 @@ void  AEnemyManager::FindSpawnPoint()
 		//만약에 이름에 SpawnPos 가 포함되어 있다면
 		if (actors[i]->GetName().Contains(TEXT("SpawnPoint")))
 		{
-
 			//spawnPosArray 에 추가한다
 			spawnPoints.Add(actors[i]);
 		}

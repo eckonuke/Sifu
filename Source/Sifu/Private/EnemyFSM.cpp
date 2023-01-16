@@ -21,6 +21,10 @@ UEnemyFSM::UEnemyFSM()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	ConstructorHelpers::FObjectFinder<USoundBase> tempSound(TEXT("SoundWave'/Game/Audio/MaleA/voice_male_grunt_pain_death_06.voice_male_grunt_pain_death_06'"));
+	if (tempSound.Succeeded()) {
+		deathSound = tempSound.Object;
+	}
 }
 
 
@@ -273,7 +277,7 @@ void UEnemyFSM::OnDamageProcess(float damage, int32 animIdx)
 
 		//죽음 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Die0"));
-
+		UGameplayStatics::PlaySound2D(GetWorld(), deathSound);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("curr HP : %f"), currHP);
 	//애니메이션 상태 동기화
@@ -329,6 +333,7 @@ void UEnemyFSM::DieState()
 		//me->Destroy();
 		//나를 비활성화
 		me->SetActive(false);
+		
 		//enemyManager 찾자
 		AActor* actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyManager::StaticClass());
 		AEnemyManager* am = Cast<AEnemyManager>(actor);

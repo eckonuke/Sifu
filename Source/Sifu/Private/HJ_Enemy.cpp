@@ -35,13 +35,9 @@ AHJ_Enemy::AHJ_Enemy()
 	{
 		GetMesh()->SetAnimInstanceClass(tempClass.Class);
 	}
-	
-
 	//월드에 배치되거나 스폰될 때 자동으로
 	//AIController 부터 Possess 될 수 있도록 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 }
 
