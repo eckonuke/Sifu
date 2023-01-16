@@ -23,6 +23,7 @@ UEnemyFSM::UEnemyFSM()
 	PrimaryComponentTick.bCanEverTick = true;
 
 
+
 }
 
 
@@ -329,29 +330,29 @@ void UEnemyFSM::DieState()
 	if (p.Z < -200.0f)
 	{
 		//2. 제거시킨다
-		//me->Destroy();
-		//나를 비활성화
-		me->SetActive(false);
-		//enemyManager 찾자
-		AActor* actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyManager::StaticClass());
-		AEnemyManager* am = Cast<AEnemyManager>(actor);
-		//찾은 놈에서enemyArray 에 나를 다시 담자
-		am->enemyArray.Add(me);
-
-		//currHP = MaxHP 로CCC
-		currHP = maxHP;
-		//상태를 Idle
-		mState = EEnemyState::Idle;
-		// 몽타주를 멈춰준다
-		me->StopAnimMontage();
-		//bDieMove 를 false 로 해준다.
-		anim->bDieDone = false;
+		me->Destroy();
+// 		나를 비활성화
+// 				me->SetActive(false);
+// 				//enemyManager 찾자
+// 				AActor* actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemyManager::StaticClass());
+// 				AEnemyManager* am = Cast<AEnemyManager>(actor);
+// 				//찾은 놈에서enemyArray 에 나를 다시 담자
+// 				//am->spawnPoints.Add(me);
+// 		
+// 				//currHP = MaxHP 로CCC
+// 				currHP = maxHP;
+// 				//상태를 Idle
+// 				mState = EEnemyState::Idle;
+// 				// 몽타주를 멈춰준다
+// 				me->StopAnimMontage();
+// 				//bDieMove 를 false 로 해준다.
+// 				anim->bDieDone = false;
 	}
 	//3. 그렇지 않으면 해당 위치로 셋팅한다
-	else
-	{
-		me->SetActorLocation(p);
-	}
+// 	else
+// 	{
+// 		me->SetActorLocation(p);
+// 	}
 }
 
 void UEnemyFSM::ReturnPosState()

@@ -98,7 +98,7 @@ public:
 
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
-	class APlayer_KYI* target;
+		class APlayer_KYI* target;
 
 	//공격 범위
 	UPROPERTY(EditAnywhere, Category = FSM)
@@ -109,16 +109,16 @@ public:
 		float attackDelayTime = 2.0f;
 
 	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess();
+		void OnDamageProcess();
 
 	//체력
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = FSM)
-	float maxHP = 2;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
-	float currHP;
+		float maxHP = 2;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+		float currHP;
 	//피격 대기 시간
-	UPROPERTY(EditAnywhere,Category = FSM)
-	float damageDelayTime = 1.0f;
+	UPROPERTY(EditAnywhere, Category = FSM)
+		float damageDelayTime = 1.0f;
 
 	//아래로 사라지는 속도
 	UPROPERTY(EditAnywhere, Category = FSM)

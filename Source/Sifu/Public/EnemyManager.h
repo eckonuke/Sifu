@@ -34,9 +34,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = SpawnSettings)
 	TArray<class AActor*>  spawnPoints;
 
-	//enemy ÅºÃ¢
-	UPROPERTY(EditAnywhere, Category = SpawnSettings)
-	TArray<class AHJ_Enemy*> enemyArray;
+// 	enemy ÅºÃ¢
+// 		UPROPERTY(EditAnywhere, Category = SpawnSettings)
+// 		TArray<class AHJ_Enemy*> enemyArray;
 
 	//enemy °øÀå
 	UPROPERTY(EditAnywhere, Category = SpawnSettings)
@@ -60,4 +60,5 @@ public:
 	int32 spawnindex = 0;
 	void FindSpawnPoint();
 
+	int32 enemynum = 0;
 };
