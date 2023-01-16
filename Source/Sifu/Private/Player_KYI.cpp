@@ -24,6 +24,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include "PlayerAnim.h"
 #include <Sound/SoundBase.h>
+#include <Blueprint/UserWidget.h>
 
 
 // Sets default values
@@ -142,6 +143,13 @@ APlayer_KYI::APlayer_KYI()
 	if (tempLowKick.Succeeded()) {
 		lowKick = tempLowKick.Object;
 	}
+	////playerUI 클래스를 가져온다
+	//ConstructorHelpers::FClassFinder<UUserWidget> tempUI(TEXT("WidgetBlueprint'/Game/SideScrollerBP/UI/PlayerUI.PlayerUI'"));
+	//if (tempUI.Succeeded()) {
+	//	playerUIFactory = tempUI.Class;
+	//}
+	////플레이어 UI 만들기
+	//playerUI = CreateWidget<UUserWidget>(GetWorld(), playerUIFactory);
 }
 
 // Called when the game starts or when spawned

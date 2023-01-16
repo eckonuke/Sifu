@@ -93,7 +93,13 @@ public:
 		class UAnimMontage* highKick;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UAnimMontage* lowKick;
-
+	
+	////playerUI 팩토리
+	//UPROPERTY(EditAnywhere)
+	//	TSubclassOf<class UUserWidget> playerUIFactory;
+	////플레이어 HP UI
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//class UUserWidget* playerUI;
 	//좌우 이동입력 이벤트 처리함수
 	void Turn(float value);
 	void LookUp(float value);
@@ -144,9 +150,9 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 currHp = 0;
+		float currHp = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 maxHp = 100;
+		float maxHp = 100;
 	//죽음 확인
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isDead = false;
