@@ -63,6 +63,22 @@ void AEnemyManager::BeginPlay()
 // 
 // 
 // 	}
+
+	//for (int32 i = 0; i < 10; i++)
+	//{
+	//	//어떤 상황이던 무조건 생성한다는 옵션
+	//	FActorSpawnParameters param;
+	//	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	//	//에너미를 만든다
+	//	AHJ_Enemy* e = GetWorld()->SpawnActor<AHJ_Enemy>(enemyFactory, GetActorLocation(), GetActorRotation(), param);
+	//	//적을 비활성화 하자
+	//	e->SetActive(false);
+
+	//	//생성된 적을 탄창(배열)에 담자
+	//	enemyArray.Add(e);
+	//}
+
 	
 }
 
@@ -139,7 +155,9 @@ void  AEnemyManager::FindSpawnPoint()
 // 	TArray<AActor*> actors;
 // 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), actors);
 
+
 // 	for (int32 i = 0; i < actors.Num(); i++)
+// 	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
 // 	{
 // 		//만약에 이름에 SpawnPos 가 포함되어 있다면
 // 		if (actors[i]->GetName().Contains(TEXT("SpawnPoint")))
@@ -149,15 +167,6 @@ void  AEnemyManager::FindSpawnPoint()
 // 			spawnPoints.Add(actors[i]);
 // 		}
 // 	}
-
-	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
-	{
-		AActor* spawn = *It;
-		if (spawn->GetName().Contains(TEXT("BP_EnemySpawnPoint")))
-		{
-			spawnPoints.Add(spawn);
-		}
-	}
 // 
 // 	//스폰 액터를 찾아서 가져오자
 // 	TArray<AActor*>actors;
@@ -168,7 +177,4 @@ void  AEnemyManager::FindSpawnPoint()
 // 		{	//spawnPoint 에 추가한다.
 // 			spawnPoints.Add(actors[i]);
 // 		}
-
-
 }
-

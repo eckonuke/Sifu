@@ -32,12 +32,27 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	//Components
 	//Spring Arm
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
 		class USpringArmComponent* springArmComp;
 	//Camera Component
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
 		class UCameraComponent* camComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
+		class USphereComponent* leftHand;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float handDamage = 5;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
+		class USphereComponent* leftLeg;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float legDamage = 10;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
+		class USphereComponent* rightLeg;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
+		float doOnce = true;
+
 
 	////공격중 이동 중지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -49,6 +64,8 @@ public:
 		bool isBlocking = false;
 	//이동방향
 	FVector direction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USoundBase* deathSound;
 	//피격 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UAnimMontage* stomach;
@@ -96,8 +113,8 @@ public:
 		void ResetCombo();
 	UFUNCTION(BlueprintCallable)
 		void PlayerBlock(bool value);
-	UFUNCTION(BlueprintCallable)
-		void setTarget();
+	//UFUNCTION(BlueprintCallable)
+	//	void setTarget();
 	//공격받은 애니메이션 플레이 함수
 	UFUNCTION(BlueprintCallable)
 		void HurtAnim0();
@@ -112,7 +129,7 @@ public:
 
 	//HJ 가 수정
 	UFUNCTION(BlueprintCallable)
-		void OnHitDamage();
+		void OnHitDamage(float damage);
 	UFUNCTION(BlueprintCallable)
 		void PlayerDamage();
 	UFUNCTION(BlueprintCallable)
@@ -127,7 +144,9 @@ public:
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		int32 hp = 500;
+		int32 currHp = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		int32 maxHp = 100;
 	//죽음 확인
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isDead = false;
@@ -147,4 +166,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool kickorPunch = true;
 
+	UFUNCTION()
+		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

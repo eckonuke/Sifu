@@ -4,6 +4,7 @@
 #include "HJ_Enemy.h"
 #include "EnemyFSM.h"
 #include <GameFramework/Character.h>
+#include "Components/PrimitiveComponent.h"
 #include <Components/InputComponent.h>
 #include <Components/CapsuleComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
@@ -13,7 +14,6 @@ AHJ_Enemy::AHJ_Enemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	//1.스켈레탈메시 데이터 로드
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("SkeletalMesh'/Game/Characters/SCK_Casual01/Models/Premade_Characters/MESH_PC_03.MESH_PC_03'"));;
 	//1-1.데이터 로드 성공하면
@@ -35,13 +35,10 @@ AHJ_Enemy::AHJ_Enemy()
 	{
 		GetMesh()->SetAnimInstanceClass(tempClass.Class);
 	}
-	
-
 	//월드에 배치되거나 스폰될 때 자동으로
 	//AIController 부터 Possess 될 수 있도록 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 }
 
 // Called when the game starts or when spawned
@@ -80,7 +77,7 @@ void AHJ_Enemy::SetActive(bool bActive)
 	//비활성화
 	else
 	{
-		//총돌 안되게 셋팅
+		//충돌 안되게 셋팅
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	//메쉬 비활성화
