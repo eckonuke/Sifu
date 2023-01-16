@@ -151,6 +151,14 @@ void  AEnemyManager::CreateEnemy()
 
 void  AEnemyManager::FindSpawnPoint()
 {
+	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+	{
+		AActor* spawn = *It;
+		if (spawn->GetName().Contains(TEXT("BP_EnemySpawnPoint")))
+		{
+			spawnPoints.Add(spawn);
+		}
+	}
 	//스폰 액터를 찾아서 가져오자
 // 	TArray<AActor*> actors;
 // 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), actors);
