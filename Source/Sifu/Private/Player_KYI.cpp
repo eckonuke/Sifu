@@ -143,6 +143,15 @@ APlayer_KYI::APlayer_KYI()
 	if (tempLowKick.Succeeded()) {
 		lowKick = tempLowKick.Object;
 	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempFinish(TEXT("AnimMontage'/Game/Mannequin/Animations/H2H_Paired/H2H_Paired_ChokeSlam_Att_Montage.H2H_Paired_ChokeSlam_Att_Montage'"));
+	if (tempFinish.Succeeded()) {
+		finish = tempFinish.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempFinishVic(TEXT("AnimMontage'/Game/Mannequin/Animations/H2H_Paired/H2H_Paired_ChokeSlam_Vic_Montage.H2H_Paired_ChokeSlam_Vic_Montage'"));
+	if (tempFinish.Succeeded()) {
+		finishVic = tempFinishVic.Object;
+	}
+
 	////playerUI 클래스를 가져온다
 	//ConstructorHelpers::FClassFinder<UUserWidget> tempUI(TEXT("WidgetBlueprint'/Game/SideScrollerBP/UI/PlayerUI.PlayerUI'"));
 	//if (tempUI.Succeeded()) {
@@ -203,6 +212,7 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
 	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::AttackPunch);
 	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::AttackKick);
+	PlayerInputComponent->BindAction(TEXT("Finish"), IE_Pressed, this, &APlayer_KYI::InputFinish);
 	DECLARE_DELEGATE_OneParam(FBlock, bool);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Pressed, this, &APlayer_KYI::PlayerBlock, true);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Released, this, &APlayer_KYI::PlayerBlock, false);
@@ -228,7 +238,7 @@ void APlayer_KYI::InputJump() {
 }
 void APlayer_KYI::InputRun(bool run) {
 	if (run)
-		GetCharacterMovement()->MaxWalkSpeed = 900;
+		GetCharacterMovement()->MaxWalkSpeed = 1000;
 	else
 		GetCharacterMovement()->MaxWalkSpeed = 600;
 }
@@ -350,9 +360,6 @@ void APlayer_KYI::saveAttackCombo() {
 			kickCombo();
 		}
 	}
-	/*leftHand->SetCollisionProfileName(TEXT("NoCollision"));
-	leftLeg->SetCollisionProfileName(TEXT("NoCollision"));
-	rightLeg->SetCollisionProfileName(TEXT("NoCollision"));*/
 	leftHand->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	leftLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	rightLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
@@ -393,6 +400,16 @@ void APlayer_KYI::kickCombo() {
 		break;
 	}
 }
+
+void APlayer_KYI::InputFinish() {
+	if (targetEnemy) {
+		FVector pos = GetActorLocation() + GetActorForwardVector()*120;
+		targetEnemy->SetActorLocation(pos);
+		PlayAnimMontage(finish);
+		targetEnemy->fsm->DamageAnim(0);
+	}
+}
+
 //플레이어 공격콤보 재설정
 void APlayer_KYI::ResetCombo() {
 	IsAttacking = false;
