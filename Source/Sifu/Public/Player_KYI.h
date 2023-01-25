@@ -50,6 +50,8 @@ public:
 		float legDamage = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
 		class USphereComponent* rightLeg;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float finishDamage = 30;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
 		float doOnce = true;
 

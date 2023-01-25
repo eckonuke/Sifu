@@ -147,10 +147,6 @@ APlayer_KYI::APlayer_KYI()
 	if (tempFinish.Succeeded()) {
 		finish = tempFinish.Object;
 	}
-	ConstructorHelpers::FObjectFinder<UAnimMontage> tempFinishVic(TEXT("AnimMontage'/Game/Mannequin/Animations/H2H_Paired/H2H_Paired_ChokeSlam_Vic_Montage.H2H_Paired_ChokeSlam_Vic_Montage'"));
-	if (tempFinish.Succeeded()) {
-		finishVic = tempFinishVic.Object;
-	}
 
 	////playerUI 클래스를 가져온다
 	//ConstructorHelpers::FClassFinder<UUserWidget> tempUI(TEXT("WidgetBlueprint'/Game/SideScrollerBP/UI/PlayerUI.PlayerUI'"));
@@ -190,14 +186,14 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
 
 void APlayer_KYI::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	targetEnemy = Cast<AHJ_Enemy>(OtherActor);
-	if (targetEnemy) {
-		if (OverlappedComponent->GetName().Contains(TEXT("hand"))) {
-			//targetEnemy->fsm->OnDamageProcess(handDamage);
-		}
-		else if (OverlappedComponent->GetName().Contains(TEXT("leg"))) {
-			//targetEnemy->fsm->OnDamageProcess(legDamage);
-		}
-	}
+	//if (targetEnemy) {
+	//	if (OverlappedComponent->GetName().Contains(TEXT("hand"))) {
+	//		//targetEnemy->fsm->OnDamageProcess(handDamage);
+	//	}
+	//	else if (OverlappedComponent->GetName().Contains(TEXT("leg"))) {
+	//		//targetEnemy->fsm->OnDamageProcess(legDamage);
+	//	}
+	//}
 }
 
 // Called to bind functionality to input
@@ -266,8 +262,10 @@ void APlayer_KYI::InputRun(bool run) {
 
 //공격 방어
 void APlayer_KYI::PlayerBlock(bool value) {
-	if (!isDead)
+	if (!isDead) {
 		isBlocking = value;
+		movementEnabled = !value;
+	}
 }
 
 //플레이어가 공격을 받았다
@@ -402,12 +400,7 @@ void APlayer_KYI::kickCombo() {
 }
 
 void APlayer_KYI::InputFinish() {
-	if (targetEnemy) {
-		FVector pos = GetActorLocation() + GetActorForwardVector()*120;
-		targetEnemy->SetActorLocation(pos);
-		PlayAnimMontage(finish);
-		targetEnemy->fsm->DamageAnim(0);
-	}
+	PlayAnimMontage(finish);	
 }
 
 //플레이어 공격콤보 재설정
@@ -421,41 +414,41 @@ void APlayer_KYI::ResetCombo() {
 
 //Stomach hit
 void APlayer_KYI::HurtAnim0() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(stomach);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //head hit2
 void APlayer_KYI::HurtAnim1() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(head2);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //head hit3
 void APlayer_KYI::HurtAnim2() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(head3);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //head hit4
 void APlayer_KYI::HurtAnim3() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(head4);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //fall down 
 void APlayer_KYI::HurtAnim4() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(falldown);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
