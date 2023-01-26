@@ -266,8 +266,6 @@ void UEnemyFSM::OnDamageProcess(float damage, int32 animIdx)
 	//만약 체력이 남아있다면 
 	if (currHP > 0)
 	{
-		//상태를 피격으로 전환
-		mState = EEnemyState::Damage;
 
 		//플레이어한테 맞으면 뒤로 밀려난다
 		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 100);
@@ -280,7 +278,23 @@ void UEnemyFSM::OnDamageProcess(float damage, int32 animIdx)
 		currentTime = 0;
 		
 		FString s = FString::Printf(TEXT("Damage%d"), animIdx);
-		anim->PlayDamageAnim(FName(*s));
+
+		//필살기 애님메이션 딜레이 시간
+		if (animIdx == 5) {
+			FTimerHandle WaitHandle;
+			float WaitTime = 5; //시간을 설정하고
+			anim->PlayDamageAnim(FName(*s));
+			GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]() {
+
+				}), WaitTime, false);
+
+		}
+		else {
+			anim->PlayDamageAnim(FName(*s));
+		}
+		//상태를 피격으로 전환
+		mState = EEnemyState::Damage;
+
 	}
 	else
 	{
@@ -405,6 +419,9 @@ void UEnemyFSM::DamageAnim(int32 attackIdx)
 	{
 		case 0: case 3:
 		damage = target->handDamage;
+		break;
+		case 5:
+		damage = target->finishDamage;
 		break;
 	}
 	OnDamageProcess(damage, attackIdx);

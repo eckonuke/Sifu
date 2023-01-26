@@ -143,6 +143,11 @@ APlayer_KYI::APlayer_KYI()
 	if (tempLowKick.Succeeded()) {
 		lowKick = tempLowKick.Object;
 	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> tempFinish(TEXT("AnimMontage'/Game/Mannequin/Animations/H2H_Paired/H2H_Paired_ChokeSlam_Att_Montage.H2H_Paired_ChokeSlam_Att_Montage'"));
+	if (tempFinish.Succeeded()) {
+		finish = tempFinish.Object;
+	}
+
 	////playerUI 클래스를 가져온다
 	//ConstructorHelpers::FClassFinder<UUserWidget> tempUI(TEXT("WidgetBlueprint'/Game/SideScrollerBP/UI/PlayerUI.PlayerUI'"));
 	//if (tempUI.Succeeded()) {
@@ -181,14 +186,14 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
 
 void APlayer_KYI::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	targetEnemy = Cast<AHJ_Enemy>(OtherActor);
-	if (targetEnemy) {
-		if (OverlappedComponent->GetName().Contains(TEXT("hand"))) {
-			//targetEnemy->fsm->OnDamageProcess(handDamage);
-		}
-		else if (OverlappedComponent->GetName().Contains(TEXT("leg"))) {
-			//targetEnemy->fsm->OnDamageProcess(legDamage);
-		}
-	}
+	//if (targetEnemy) {
+	//	if (OverlappedComponent->GetName().Contains(TEXT("hand"))) {
+	//		//targetEnemy->fsm->OnDamageProcess(handDamage);
+	//	}
+	//	else if (OverlappedComponent->GetName().Contains(TEXT("leg"))) {
+	//		//targetEnemy->fsm->OnDamageProcess(legDamage);
+	//	}
+	//}
 }
 
 // Called to bind functionality to input
@@ -203,6 +208,7 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
 	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::AttackPunch);
 	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::AttackKick);
+	PlayerInputComponent->BindAction(TEXT("Finish"), IE_Pressed, this, &APlayer_KYI::InputFinish);
 	DECLARE_DELEGATE_OneParam(FBlock, bool);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Pressed, this, &APlayer_KYI::PlayerBlock, true);
 	PlayerInputComponent->BindAction<FBlock>(TEXT("Block"), IE_Released, this, &APlayer_KYI::PlayerBlock, false);
@@ -228,7 +234,7 @@ void APlayer_KYI::InputJump() {
 }
 void APlayer_KYI::InputRun(bool run) {
 	if (run)
-		GetCharacterMovement()->MaxWalkSpeed = 900;
+		GetCharacterMovement()->MaxWalkSpeed = 1000;
 	else
 		GetCharacterMovement()->MaxWalkSpeed = 600;
 }
@@ -256,8 +262,10 @@ void APlayer_KYI::InputRun(bool run) {
 
 //공격 방어
 void APlayer_KYI::PlayerBlock(bool value) {
-	if (!isDead)
+	if (!isDead) {
 		isBlocking = value;
+		movementEnabled = !value;
+	}
 }
 
 //플레이어가 공격을 받았다
@@ -350,9 +358,6 @@ void APlayer_KYI::saveAttackCombo() {
 			kickCombo();
 		}
 	}
-	/*leftHand->SetCollisionProfileName(TEXT("NoCollision"));
-	leftLeg->SetCollisionProfileName(TEXT("NoCollision"));
-	rightLeg->SetCollisionProfileName(TEXT("NoCollision"));*/
 	leftHand->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	leftLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	rightLeg->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
@@ -393,6 +398,11 @@ void APlayer_KYI::kickCombo() {
 		break;
 	}
 }
+
+void APlayer_KYI::InputFinish() {
+	PlayAnimMontage(finish);	
+}
+
 //플레이어 공격콤보 재설정
 void APlayer_KYI::ResetCombo() {
 	IsAttacking = false;
@@ -404,41 +414,41 @@ void APlayer_KYI::ResetCombo() {
 
 //Stomach hit
 void APlayer_KYI::HurtAnim0() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(stomach);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //head hit2
 void APlayer_KYI::HurtAnim1() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(head2);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //head hit3
 void APlayer_KYI::HurtAnim2() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(head3);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //head hit4
 void APlayer_KYI::HurtAnim3() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(head4);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }
 //fall down 
 void APlayer_KYI::HurtAnim4() {
-	if (!isDead) {
+	if (!isDead && !isBlocking) {
 		PlayAnimMontage(falldown);
 		//OnHitDamage();
-		ResetCombo();
 	}
+	ResetCombo();
 }

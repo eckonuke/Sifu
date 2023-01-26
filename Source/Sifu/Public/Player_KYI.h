@@ -50,6 +50,8 @@ public:
 		float legDamage = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
 		class USphereComponent* rightLeg;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float finishDamage = 30;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Mesh)
 		float doOnce = true;
 
@@ -94,6 +96,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UAnimMontage* lowKick;
 	
+	//피니시 타격
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UAnimMontage* finish;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UAnimMontage* finishVic;
+	
 	////playerUI 팩토리
 	//UPROPERTY(EditAnywhere)
 	//	TSubclassOf<class UUserWidget> playerUIFactory;
@@ -109,6 +117,7 @@ public:
 	void InputRun(bool run);
 	void AttackPunch();
 	void AttackKick();
+	void InputFinish();
 	UFUNCTION(BlueprintCallable)
 		void saveAttackCombo();
 	UFUNCTION(BlueprintCallable)
