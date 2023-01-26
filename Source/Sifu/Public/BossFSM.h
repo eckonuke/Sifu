@@ -16,6 +16,7 @@
 UENUM(BlueprintType)
 enum class EBossState :uint8
 {
+	Appear,
 	Idle,
 	Move,
 	Attack,
@@ -46,8 +47,9 @@ public:
 public:
 	//상태 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)// VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-		EBossState bState = EBossState::Idle;
-
+		EBossState bState = EBossState::Appear;
+	//등장 상태
+	void AppearState();
 	//대기 상태
 	void IdleState();
 	//이동 상태
@@ -66,7 +68,6 @@ public:
 	void BossAnim(int32 attackIdx);
 	//타겟을 쫒아 갈 수 있니?
 	bool IsTargetTrace();
-
 	
 
 	//대기 시간
@@ -75,6 +76,8 @@ public:
 
 	//경과 시간
 	float currentTime = 0;
+	//설정 시간
+	float createTime = 4;
 	//쫓아 갈 수 있는 범위
 	float traceRange = 800;
 
@@ -129,4 +132,9 @@ public:
 	FVector randomPos;
 	//랜덤 위치 가져오기
 	bool GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest);
+
+	UFUNCTION(BlueprintCallable)
+	void OnAppearStart();
+
+	bool bAppear = false;
 };

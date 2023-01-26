@@ -32,9 +32,13 @@ public:
 			//피격 애니메이션 재생 함수 
 	UFUNCTION(BlueprintImplementableEvent,Category = FSMEvent)
 				void PlayBossAnim(FName sectionName);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
+	class UBossFSM* bfsm;
 
 // 	죽음 상태 애니메이션 종료 여부, BlueprintReadWrite
 // 			UPROPERTY(EditDefaultsOnly,Category = FSM)
 // 				bool bDieDone = false;
 
+	UFUNCTION()
+	void AnimNotify_EndAppear();
 };

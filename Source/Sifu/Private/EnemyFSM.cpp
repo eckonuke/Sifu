@@ -113,18 +113,28 @@ void UEnemyFSM::IdleState()
 	// 		anim->animState = mState;
 	// 	}
 
-	//만약에 Player 를 쫓아 갈 수 있니? ( 내 시야에 보이면)
-	currentTime += GetWorld()->DeltaTimeSeconds;
-	//if (IsTargetTrace())	
-	if (currentTime > idleDelayTime)
+	//만약에 플레이어를 쫓아 갈 수 있니?
+	if (IsTargetTrace())
 	{
-		currentTime = 0;
 		//상태를 Move 로 전환
 		mState = EEnemyState::Move;
-		//애니메이션 상태 동기화 
-		anim->animState = mState;
-		//최초 랜덤한 위치 정해주기
-		GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
+	}
+	//만약에 Player 를 쫓아 갈 수 있니? ( 내 시야에 보이면)
+	//currentTime += GetWorld()->DeltaTimeSeconds;
+	else
+	{
+
+		//if (currentTime > idleDelayTime)
+		if (IsTargetTrace())	
+		{
+			currentTime = 0;
+			//상태를 Move 로 전환
+			mState = EEnemyState::Move;
+			//애니메이션 상태 동기화 
+			anim->animState = mState;
+			//최초 랜덤한 위치 정해주기
+			GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
+		}
 	}
 }
 //이동 상태
@@ -415,7 +425,7 @@ bool UEnemyFSM::IsTargetTrace()
 	//나 - 타겟 과의 거리가 traceRange 보다 작으면
 	if (degree < 30)// && dir.Length() < traceRange)
 	{
-		//return true;
+		return true;
 
 		//Enemy ----> targetLinTrace 쏘자 !
 		FHitResult hitInfo;

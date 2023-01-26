@@ -60,7 +60,17 @@ void UBossFSM::BeginPlay()
 
 	//AIController 할당하기
 	bi = Cast<AAIController>(boss->GetController());
+
 	
+}
+
+void UBossFSM::OnAppearStart()
+{
+	bAppear = true;
+	banim->PlayBossAnim(TEXT("Attack0"));
+
+//  	bState = EBossState::Appear;
+//   	banim->banimState = bState;
 }
 
 
@@ -69,48 +79,76 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-
-	switch (bState)
+	if (bAppear == true)
 	{
-	case EBossState::Idle:
-		IdleState();
-		break;
-	case EBossState::Move:
-		MoveState();
-		break;
-	case EBossState::Attack:
-		AttackState();
-		break;
-	case EBossState::Damage:
-		DamageState();
-		break;
-	case EBossState::Die:
-		DieState();
-		break;
-	case EBossState::ReturnPos:
-		ReturnPosState();
-		break;
-	}
-}
-	//대기 상태
-	void UBossFSM::IdleState()
-	{
-		//만약에 플레이어를 쫓아 갈 수 있니?
-		if (IsTargetTrace())
+		switch (bState)
 		{
-			//상태를 Move 로 전환
-			bState = EBossState::Move;
+		case EBossState::Appear:
+			AppearState();
+			break;
+		case EBossState::Idle:
+			IdleState();
+			break;
+		case EBossState::Move:
+			MoveState();
+			break;
+		case EBossState::Attack:
+			AttackState();
+			break;
+		case EBossState::Damage:
+			DamageState();
+			break;
+		case EBossState::Die:
+			DieState();
+			break;
+		case EBossState::ReturnPos:
+			ReturnPosState();
+			break;
 		}
+	}
 
-		else
-		{
+}
+
+void UBossFSM::AppearState()
+{
+	UE_LOG(LogTemp,Warning,TEXT("2222222222222"));
+
+	//앞으로 이동하는 코드
+	FVector Jumpdir = target->GetActorLocation() - boss->GetActorLocation();
+	//FVector destination = target->GetActorLocation();
+	//boss->SetActorLocation(Jumpdir);
+
+	bState = EBossState::Idle;
+	banim->banimState = bState;
+}
+
+
+//대기 상태
+void UBossFSM::IdleState()
+{
+
+	//만약에 플레이어를 쫓아 갈 수 있니?
+	currentTime += GetWorld()->DeltaTimeSeconds;
+	if (currentTime > createTime)
+	{
+		// 		if (IsTargetTrace())
+		// 		{
+		// 			//상태를 Move 로 전환
+		// 			bState = EBossState::Move;
+		// 			banim->banimState = bState;
+			// 
+			// 
+			// 		}
+
 
 			//만약에 Player 를 쫓아 갈 수 있니? ( 내 시야에 보이면)
-			currentTime += GetWorld()->DeltaTimeSeconds;
-			//if (IsTargetTrace())	
-			if (currentTime > idleDelayTime)
+			//currentTime += GetWorld()->DeltaTimeSeconds;
+			//if (currentTime > idleDelayTime)
+			if (IsTargetTrace())
 			{
+				
 				currentTime = 0;
+
 				//상태를 Move 로 전환
 				bState = EBossState::Move;
 				//애니메이션 상태 동기화 
@@ -118,24 +156,29 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 				//최초 랜덤한 위치 정해주기
 				GetRandomPositionInNavMesh(boss->GetActorLocation(), 500, randomPos);
 			}
-
 		}
-	}
-	//이동 상태
-	void UBossFSM::MoveState()
-	{
-		//1. 타겟을 향하는 방향을 구하고(target - me)
-		FVector dir = target->GetActorLocation() - boss->GetActorLocation();
 
-		//1). 처음 위치 - 나의 위치 거리를 구한다.
-		float dist = FVector::Distance(originPos, boss->GetActorLocation());
+}
+
+//이동 상태
+void UBossFSM::MoveState()
+{
+	//1. 타겟을 향하는 방향을 구하고(target - me)
+	FVector dir = target->GetActorLocation() - boss->GetActorLocation();
+
+	//1). 처음 위치 - 나의 위치 거리를 구한다.
+	float dist = FVector::Distance(originPos, boss->GetActorLocation());
+
 
 
 		//2). 만약에 dist 가 moveRange 보다 커지면 (움직일 수 있는 반경을 넘어갔다면)
 		if (dist > moveRange)
 		{
+			bState = EBossState::Idle;
+			//애니메이션 상태 동기화 
+			banim->banimState = bState;
 			//3). ReturnPos 상태로 전환 
-			bState = EBossState::ReturnPos;
+			//bState = EBossState::ReturnPos;
 		}
 
 		//타깃과 가까워지면 공격 상태로 전환하고 싶다.
@@ -152,7 +195,7 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 			banim->banimState = bState;
 
 			//공격 애니메이션 재생 활성화 
-			//banim->PlayDamageAnim(TEXT("Idle"));
+
 
 			//공격 상태 전환 시 대기 시간이 바로 끝나도록 처리
 			currentTime = attackDelayTime;
@@ -193,11 +236,12 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 					//애니메이션 상태 동기화 
 					banim->banimState = bState;
 					//새로운 랜덤 위치 가져오기
-					//GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
+					//GetRandomPositionInNavMesh(boss->GetActorLocation(), 500, randomPos);
 				}
 			}
 		}
-	}
+		
+}
 
 	
 	//공격상태
@@ -219,7 +263,7 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 			// 경과 시간 초기화
 			currentTime = 0;
 			//공격 애니메이션 랜덤으로 재생하기
-			int32 index = FMath::RandRange(0, 3);
+			int32 index = FMath::RandRange(1, 5);
 			FString sectionName = FString::Printf(TEXT("Attack%d"), index);
 			banim->PlayBossAnim(FName(*sectionName));
 
@@ -305,13 +349,13 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	{
 		//아직 죽음 애니메이션이 끝나지 않았다면 
 		//바닥까지 내려가지 않도록 처리
-		if (banim->bDieDone == false)
-		{
-			//플레이어한테 맞으면 뒤로 밀려난다
-			FVector s = boss->GetActorLocation() + (-boss->GetActorForwardVector() * 3);
-			boss->SetActorLocation(s);
-			return;
-		}
+// 		if (banim->bDieDone == false)
+// 		{
+// 			//플레이어한테 맞으면 뒤로 밀려난다
+// 			FVector s = boss->GetActorLocation() + (-boss->GetActorForwardVector() * 3);
+// 			boss->SetActorLocation(s);
+// 			return;
+// 		}
 // 		//계속 아래로 내려가고 싶다. p=p0+vt
 // 		FVector p0 = boss->GetActorLocation();
 // 		FVector p = p0 + FVector::DownVector * dieSpeed * GetWorld()->DeltaTimeSeconds;
@@ -347,7 +391,7 @@ void UBossFSM::BossAnim(int32 attackIdx)
 		{
 			//	//4. idle 상태로 전환
 			bState = EBossState::Idle;
-			//banim->animState = bState;
+			banim->banimState = bState;
 		}
 	}
 
@@ -367,7 +411,7 @@ void UBossFSM::BossAnim(int32 attackIdx)
 		//나 - 타겟 과의 거리가 traceRange 보다 작으면
 		if (degree < 30)// && dir.Length() < traceRange)
 		{
-			//return true;
+			return true;
 
 			//Enemy ----> targetLinTrace 쏘자 !
 			FHitResult hitInfo;
