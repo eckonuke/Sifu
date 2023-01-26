@@ -92,6 +92,7 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 //대기 상태
 void UEnemyFSM::IdleState()
 {
+
 	// 	//1. 시간이 흘렀으니까 
 	// 	currentTime += GetWorld()->DeltaTimeSeconds;
 	// 	//2. 만약 경과 시간이 대기 시간을 초과했다면
@@ -204,10 +205,7 @@ void UEnemyFSM::MoveState()
 	}
 }
 
-void UEnemyFSM::PatrolState()
-{
 
-}
 //공격 상태
 void UEnemyFSM::AttackState()
 {
@@ -264,6 +262,11 @@ void UEnemyFSM::OnDamageProcess(float damage, int32 animIdx)
 		//플레이어한테 맞으면 뒤로 밀려난다
 		//FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 100);
 		//me->SetActorLocation(s);
+		
+		//플레이어한테 맞으면 뒤로 밀려난다
+		FVector dir = me->GetActorLocation() + (-me->GetActorForwardVector() * 20);
+		me->SetActorLocation(dir);
+		
 		currentTime = 0;
 		
 		FString s = FString::Printf(TEXT("Damage%d"), animIdx);
@@ -316,8 +319,8 @@ void UEnemyFSM::DieState()
 	if (anim->bDieDone == false)
 	{
 		//플레이어한테 맞으면 뒤로 밀려난다
-		/*FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 5);
-		me->SetActorLocation(s);*/
+		FVector s = me->GetActorLocation() + (-me->GetActorForwardVector() * 3);
+		me->SetActorLocation(s);
 		return;
 	}
 
@@ -396,36 +399,7 @@ void UEnemyFSM::DamageAnim(int32 attackIdx)
 	}
 	OnDamageProcess(damage, attackIdx);
 }
-//DamgeAnim0 번 호출 함수
-void  UEnemyFSM::DamageAnim0()
-{
-	//anim->PlayDamageAnim(TEXT("Damage0"));
-	OnDamageProcess(target->handDamage, 0);
-}
-//DamgeAnim1 번 호출 함수
-void  UEnemyFSM::DamageAnim1()
-{
-	//anim->PlayDamageAnim(TEXT("Damage1"));
-	OnDamageProcess(target->legDamage, 1);
-}
-//DamgeAnim2 번 호출 함수
-void  UEnemyFSM::DamageAnim2()
-{
-	//anim->PlayDamageAnim(TEXT("Damage2"));
-	OnDamageProcess(target->legDamage, 2);
-}
-//DamgeAnim3 번 호출 함수
-void  UEnemyFSM::DamageAnim3()
-{
-	//anim->PlayDamageAnim(TEXT("Damage3"));
-	OnDamageProcess(target->handDamage, 3);
-}
-//DamgeAnim4 번 호출 함수
-void  UEnemyFSM::DamageAnim4()
-{
-	//anim->PlayDamageAnim(TEXT("Damage4"));
-	OnDamageProcess(target->legDamage, 4);
-}
+
 
 bool UEnemyFSM::IsTargetTrace()
 {

@@ -152,7 +152,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		float currHp = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		float maxHp = 100;
+		float maxHp = 10000;
 	//Á×À½ È®ÀÎ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isDead = false;

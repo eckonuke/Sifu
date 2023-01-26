@@ -13,7 +13,6 @@ enum class EEnemyState :uint8
 {
 	Idle,
 	Move,
-	Patrol,
 	Attack,
 	Damage,
 	Die,
@@ -47,7 +46,7 @@ public:
 	void IdleState();
 	//이동 상태
 	void MoveState();
-	void PatrolState();
+	
 	//공격상태
 	void AttackState();
 	//피격 상태
@@ -62,20 +61,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DamageAnim(int32 attackIdx);
 
-	UFUNCTION(BlueprintCallable)
-		void DamageAnim0();
-
-	UFUNCTION(BlueprintCallable)
-		void DamageAnim1();
-
-	UFUNCTION(BlueprintCallable)
-		void DamageAnim2();
-
-	UFUNCTION(BlueprintCallable)
-		void DamageAnim3();
-
-	UFUNCTION(BlueprintCallable)
-		void DamageAnim4();
 	//타겟을 쫒아 갈 수 있니?
 	bool IsTargetTrace();
 
