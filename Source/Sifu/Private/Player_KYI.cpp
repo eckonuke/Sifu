@@ -25,6 +25,7 @@
 #include "PlayerAnim.h"
 #include <Sound/SoundBase.h>
 #include <Blueprint/UserWidget.h>
+#include "HJ_Boss.h"
 
 
 // Sets default values
@@ -186,6 +187,7 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
 
 void APlayer_KYI::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	targetEnemy = Cast<AHJ_Enemy>(OtherActor);
+	targetBoss = Cast<AHJ_Boss>(OtherActor);
 	//if (targetEnemy) {
 	//	if (OverlappedComponent->GetName().Contains(TEXT("hand"))) {
 	//		//targetEnemy->fsm->OnDamageProcess(handDamage);
@@ -200,11 +202,6 @@ void APlayer_KYI::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &APlayer_KYI::Turn);
-	PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &APlayer_KYI::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputHorizontal);
-	PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &APlayer_KYI::InputVertical);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
 	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::AttackPunch);
 	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::AttackKick);
@@ -215,6 +212,16 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	DECLARE_DELEGATE_OneParam(FRun, bool);
 	PlayerInputComponent->BindAction<FRun>(TEXT("Run"), IE_Pressed, this, &APlayer_KYI::InputRun, true);
 	PlayerInputComponent->BindAction<FRun>(TEXT("Run"), IE_Released, this, &APlayer_KYI::InputRun, false);
+
+	if (GetWorld()->GetCurrentLevel()->GetFullName().Contains("FinalBossMap")) {
+		PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputVertical);
+	}
+	else {
+		PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputHorizontal);
+		PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &APlayer_KYI::InputVertical);
+		PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &APlayer_KYI::Turn);
+		PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &APlayer_KYI::LookUp);
+	}
 }
 
 void APlayer_KYI::Turn(float value) {
@@ -224,7 +231,12 @@ void APlayer_KYI::LookUp(float value) {
 	AddControllerPitchInput(value);
 }
 void APlayer_KYI::InputHorizontal(float value) {
-	direction.Y = value;
+	if (GetWorld()->GetCurrentLevel()->GetFullName().Contains("FinalBossMap")) {
+		direction.Y = -value;
+	}
+	else {
+		direction.Y = value;
+	}
 }
 void APlayer_KYI::InputVertical(float value) {
 	direction.X = value;
@@ -270,19 +282,17 @@ void APlayer_KYI::PlayerBlock(bool value) {
 
 //플레이어가 공격을 받았다
 void APlayer_KYI::OnHitDamage(float damage) {
-	if (!isDead) {
-		if (!isBlocking) {
-			//체력 감소
-			currHp -= damage;
-			//만약에 체력이 없다면
-			if (currHp <= 0) {
-				isDead = true;
-				//상태를 죽음으로 전환
-				PlayerDie();
-				//캡슐 충돌체 비활성화
-				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				//GetComponentByClass(UCapsuleComponent::StaticClass())
-			}
+	if (!isDead && !isBlocking) {
+		//체력 감소
+		currHp -= damage;
+		//만약에 체력이 없다면
+		if (currHp <= 0) {
+			isDead = true;
+			//상태를 죽음으로 전환
+			PlayerDie();
+			//캡슐 충돌체 비활성화
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			//GetComponentByClass(UCapsuleComponent::StaticClass())
 		}
 	}
 }
