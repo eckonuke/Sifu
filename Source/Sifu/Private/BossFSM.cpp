@@ -113,13 +113,37 @@ void UBossFSM::AppearState()
 {
 	UE_LOG(LogTemp,Warning,TEXT("2222222222222"));
 
-	//앞으로 이동하는 코드
-	FVector Jumpdir = target->GetActorLocation() - boss->GetActorLocation();
-	//FVector destination = target->GetActorLocation();
-	//boss->SetActorLocation(Jumpdir);
+	//bi->MoveToLocation(target->GetActorLocation());
+// 	앞으로 이동하는 코드
+//  		FVector Jumpdir = target->GetActorLocation() - boss->GetActorLocation();
+//  		FVector destination = target->GetActorLocation();
+// 		boss->SetActorLocation(Jumpdir);
+// 	
+// 		bState = EBossState::Idle;
+// 		banim->banimState = bState;
+}
 
-	bState = EBossState::Idle;
-	banim->banimState = bState;
+void UBossFSM::SetBoss()
+{
+ 	FVector pos = boss->GetActorLocation();
+  	pos.X = -2160.000000;
+ 	pos.Y = -6812.000000;
+	pos.Z = 2333.060439;
+ 	boss->SetActorLocation(pos);
+
+	//FinishAppear();
+}
+
+void UBossFSM::FinishAppear()
+{
+	if (bState == EBossState::Appear)
+	{
+		// 보스FSM 에 Idle 로 상태를 바꿔라
+		bi->StopMovement();
+		bState = EBossState::Idle;
+		banim->StopAllMontages(0);
+		SetBoss();
+	}
 }
 
 
@@ -154,7 +178,7 @@ void UBossFSM::IdleState()
 				//애니메이션 상태 동기화 
 				banim->banimState = bState;
 				//최초 랜덤한 위치 정해주기
-				GetRandomPositionInNavMesh(boss->GetActorLocation(), 500, randomPos);
+				//GetRandomPositionInNavMesh(boss->GetActorLocation(), 500, randomPos);
 			}
 		}
 

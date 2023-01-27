@@ -15,6 +15,9 @@ class SIFU_API UHJ_BossAnim : public UAnimInstance
 {
 	GENERATED_BODY()
 public:
+	virtual void NativeBeginPlay() override;
+
+public:
 
 	//상태머신 기억변수
 
@@ -32,7 +35,8 @@ public:
 			//피격 애니메이션 재생 함수 
 	UFUNCTION(BlueprintImplementableEvent,Category = FSMEvent)
 				void PlayBossAnim(FName sectionName);
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FSMComponent)
 	class UBossFSM* bfsm;
 
 // 	죽음 상태 애니메이션 종료 여부, BlueprintReadWrite

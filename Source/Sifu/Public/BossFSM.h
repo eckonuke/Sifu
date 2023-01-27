@@ -47,7 +47,7 @@ public:
 public:
 	//상태 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)// VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-		EBossState bState = EBossState::Appear;
+	EBossState bState = EBossState::Appear;
 	//등장 상태
 	void AppearState();
 	//대기 상태
@@ -135,6 +135,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnAppearStart();
-
 	bool bAppear = false;
+	void SetBoss();
+	void FinishAppear();
 };

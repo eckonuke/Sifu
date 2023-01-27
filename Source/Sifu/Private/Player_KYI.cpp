@@ -201,10 +201,7 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &APlayer_KYI::Turn);
-	PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &APlayer_KYI::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputHorizontal);
-	PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &APlayer_KYI::InputVertical);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
 	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::AttackPunch);
 	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::AttackKick);
@@ -215,6 +212,17 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	DECLARE_DELEGATE_OneParam(FRun, bool);
 	PlayerInputComponent->BindAction<FRun>(TEXT("Run"), IE_Pressed, this, &APlayer_KYI::InputRun, true);
 	PlayerInputComponent->BindAction<FRun>(TEXT("Run"), IE_Released, this, &APlayer_KYI::InputRun, false);
+
+	if (GetWorld()->GetCurrentLevel()->GetFullName().Contains("FinalBossMap")) {
+		PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputVertical);
+	}
+	else {
+		PlayerInputComponent->BindAxis(TEXT("Move Right / Left"), this, &APlayer_KYI::InputHorizontal);
+		PlayerInputComponent->BindAxis(TEXT("Move Forward / Backward"), this, &APlayer_KYI::InputVertical);
+		PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &APlayer_KYI::Turn);
+		PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &APlayer_KYI::LookUp);
+	}
+
 }
 
 void APlayer_KYI::Turn(float value) {
@@ -224,7 +232,12 @@ void APlayer_KYI::LookUp(float value) {
 	AddControllerPitchInput(value);
 }
 void APlayer_KYI::InputHorizontal(float value) {
-	direction.Y = value;
+	if (GetWorld()->GetCurrentLevel()->GetFullName().Contains("FinalBossMap")) {
+		direction.Y = -value;
+	}
+	else {
+		direction.Y = value;
+	}
 }
 void APlayer_KYI::InputVertical(float value) {
 	direction.X = value;
