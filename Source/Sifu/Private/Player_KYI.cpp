@@ -25,6 +25,7 @@
 #include "PlayerAnim.h"
 #include <Sound/SoundBase.h>
 #include <Blueprint/UserWidget.h>
+#include "HJ_Boss.h"
 
 
 // Sets default values
@@ -186,6 +187,7 @@ void APlayer_KYI::NotifyActorBeginOverlap(AActor* OtherActor) {
 
 void APlayer_KYI::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	targetEnemy = Cast<AHJ_Enemy>(OtherActor);
+	targetBoss = Cast<AHJ_Boss>(OtherActor);
 	//if (targetEnemy) {
 	//	if (OverlappedComponent->GetName().Contains(TEXT("hand"))) {
 	//		//targetEnemy->fsm->OnDamageProcess(handDamage);
@@ -201,7 +203,6 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &APlayer_KYI::InputJump);
 	PlayerInputComponent->BindAction(TEXT("Punch"), IE_Pressed, this, &APlayer_KYI::AttackPunch);
 	PlayerInputComponent->BindAction(TEXT("Kick"), IE_Pressed, this, &APlayer_KYI::AttackKick);
@@ -222,7 +223,6 @@ void APlayer_KYI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		PlayerInputComponent->BindAxis(TEXT("Turn Right / Left Mouse"), this, &APlayer_KYI::Turn);
 		PlayerInputComponent->BindAxis(TEXT("Look Up / Down Mouse"), this, &APlayer_KYI::LookUp);
 	}
-
 }
 
 void APlayer_KYI::Turn(float value) {
@@ -283,19 +283,17 @@ void APlayer_KYI::PlayerBlock(bool value) {
 
 //플레이어가 공격을 받았다
 void APlayer_KYI::OnHitDamage(float damage) {
-	if (!isDead) {
-		if (!isBlocking) {
-			//체력 감소
-			currHp -= damage;
-			//만약에 체력이 없다면
-			if (currHp <= 0) {
-				isDead = true;
-				//상태를 죽음으로 전환
-				PlayerDie();
-				//캡슐 충돌체 비활성화
-				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				//GetComponentByClass(UCapsuleComponent::StaticClass())
-			}
+	if (!isDead && !isBlocking) {
+		//체력 감소
+		currHp -= damage;
+		//만약에 체력이 없다면
+		if (currHp <= 0) {
+			isDead = true;
+			//상태를 죽음으로 전환
+			PlayerDie();
+			//캡슐 충돌체 비활성화
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			//GetComponentByClass(UCapsuleComponent::StaticClass())
 		}
 	}
 }

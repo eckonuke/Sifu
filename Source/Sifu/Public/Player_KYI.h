@@ -153,6 +153,9 @@ public:
 	//타게팅 된 적
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class AHJ_Enemy* targetEnemy;
+	//타게팅 된 보스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AHJ_Boss* targetBoss;
 	//타겟 여부 확인
 	UPROPERTY(EditAnywhere)
 		bool targetLock = false;
@@ -161,7 +164,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		float currHp = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-		float maxHp = 10000;
+		float maxHp = 100;
 	//죽음 확인
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isDead = false;
